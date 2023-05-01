@@ -15,6 +15,7 @@ if(status>0)
 	out.println("Inserted successfully..");
 else
 	out.println("Insertion Failure..");
-%>
+%><br><br>
+<a href="student.jsp">Link to student</a>
 </body>
 </html>
