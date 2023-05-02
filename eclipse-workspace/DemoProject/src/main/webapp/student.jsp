@@ -3,12 +3,20 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+table { 
+	border-collapse: separate; border-spacing: 5px; 
+}
+</style>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
 <TABLE>
-      <TR><td></TR>
+      <TR>
+      <td><a href="student.jsp">student</a></td>
+      <td><a href="faculty.jsp">faculty</a></td>
+      </TR>
 </TABLE>
 
 <H1>Adding Student</H1>
@@ -22,6 +30,7 @@ Enrolled: <input type="text" name="enrolled" size="2"/>
 Residential_status: <input type="text" name="residential_status" size="5"/>
 Current Degree: <input type="text" name="current_degree" size="5"/>
 <input type="submit" value="Submit"/>
+</form>
 
 <H1>Current Students</H1>
        <%
@@ -54,6 +63,5 @@ Current Degree: <input type="text" name="current_degree" size="5"/>
       <% } %>
      </TABLE>
 
-</form>
 </body>
 </html>
