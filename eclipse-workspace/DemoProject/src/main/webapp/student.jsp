@@ -56,15 +56,13 @@ if (action != null && action.equals("insert")) {
 	conn.close();
 }
 if (action != null && action.equals("update")) {
-	//try{
+	try{
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Student table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE student SET first_name = \'?\', " +
-	"last_name = '?', middle_name = '?', ssn = ?, enrolled = '?', residential_status = '?', " +
-	"current_degree = '?' WHERE student_id = ?");	
+	"UPDATE student SET first_name = ?, last_name = ?, middle_name = ?, ssn = ?, enrolled = ?, residential_status = ?, current_degree = ? WHERE student_id = ?");	
 	pstmt.setString(1, request.getParameter("first_name"));
 	pstmt.setString(2, request.getParameter("last_name"));
 	pstmt.setString(3, request.getParameter("middle_name"));	
@@ -74,15 +72,15 @@ if (action != null && action.equals("update")) {
 	pstmt.setString(7, request.getParameter("current_degree"));
 	pstmt.setInt(8,Integer.parseInt(request.getParameter("student_id")));
 	
-	out.println(pstmt.toString());
-	System.out.println(pstmt.toString());
+	// out.println(pstmt.toString());
+	// System.out.println(pstmt.toString());
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
-	// catch(Exception ex){
-	//	System.out.println(ex);
-	//}
+	}catch(Exception ex){
+		System.out.println(ex);
+	}
 }
 if (action != null && action.equals("delete")) {
 	Connection conn = ConnectionProvider.getCon();
@@ -123,7 +121,7 @@ if (action != null && action.equals("delete")) {
       <td><input value="<%= resultset.getInt(1) %>" name="student_id"></td>
 	  <td><input value="<%= resultset.getString(2) %>" name="first_name"></td>      
       <TD><input value="<%= resultset.getString(3) %>" name="last_name"></TD>
-      <TD><input vlaue="<%= resultset.getString(4) %>" name="middle_name"></TD>
+      <TD><input value="<%= resultset.getString(4) %>" name="middle_name"></TD>
       <TD><input value="<%= resultset.getInt(5) %>" name="ssn"> </TD>
       <TD><input value="<%= resultset.getString(6) %>" name="enrolled"></TD>
       <TD><input value="<%= resultset.getString(7) %>" name="residential_status"> </TD>
