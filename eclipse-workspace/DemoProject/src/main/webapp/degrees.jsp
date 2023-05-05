@@ -113,7 +113,7 @@ if (action != null && action.equals("delete")) {
       <form action="degrees.jsp" method="get">
       <input type="hidden" value="update" name="action">
       <td><input value="<%= resultset.getString(1) %>" name="major"></td>      
-      <TD><input value="<%= resultset.getString(2) %>" name="type"></TD>
+      <TD><input value="<%= resultset.getString(2) %>" name="type" ></TD>
       <TD><input value="<%= resultset.getString(3) %>" name="category"></TD>
       <TD><input value="<%= resultset.getInt(4) %>" name="minimum_unit"> </TD>
       <TD><input value="<%= resultset.getString(5) %>" name="minimum_grade"></TD>
@@ -123,7 +123,8 @@ if (action != null && action.equals("delete")) {
 		<input type="hidden" value="delete" name="action">
 		<input type="hidden" value="<%= resultset.getString(1) %>" name="major">     
         <input type="hidden" value="<%= resultset.getString(2) %>" name="type">
-        <input type="hidden" value="<%= resultset.getString(3) %>" name="category"><td><input type="submit" value="Delete"></td>
+        <input type="hidden" value="<%= resultset.getString(3) %>" name="category">
+        <TD><input type="submit" value="Delete"></TD>
 		</form>
       </TR>
       <% } %>
