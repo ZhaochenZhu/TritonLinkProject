@@ -21,6 +21,7 @@ table {
         <td><a href="degrees.jsp">degrees</a></td>
         <td><a href="student_probation.jsp">student probation</a></td> 
         <td><a href="thesis_committee.jsp">thesis committee</a></td>  
+        <td><a href="courses_taken.jsp">courses taken</a></td>  
     </TR>
 </TABLE>
 

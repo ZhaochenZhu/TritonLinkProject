@@ -21,21 +21,20 @@ table {
 		<td><a href="degrees.jsp">degrees</a></td>
 		<td><a href="student_probation.jsp">student probation</a></td>  
 		<td><a href="thesis_committee.jsp">thesis committee</a></td>  
-		<td><a href="courses_taken.jsp">courses taken</a></td>  
+        <td><a href="courses_taken.jsp">courses taken</a></td>  
     </TR>
 </TABLE>
 
-<H1>Adding Student</H1>
+<H1>Adding Courses taken</H1>
 <form name = "f1" method="get">
 <input type="hidden" value="insert" name="action">
 Student ID: <input type="text" name="student_id" size="5"/>
-First name: <input type="text" name="first_name" size="5"/>
-Last name: <input type="text" name="last_name" size="5"/>
-Middle name: <input type="text" name="middle_name" size="2"/>
-SSN: <input type="text" name="ssn" size="5"/>
-Enrolled: <input type="text" name="enrolled" size="2"/>
-Residential_status: <input type="text" name="residential_status" size="5"/>
-Current Degree: <input type="text" name="current_degree" size="5"/>
+Course number: <input type="text" name="course_number" size="5"/>
+Section ID: <input type="text" name="section_id" size="5"/>
+Year: <input type="text" name="year" size="2"/>
+Unit: <input type="text" name="unit" size="5"/>
+Grade: <input type="text" name="grade" size="2"/>
+Professor: <input type="text" name="professor" size="5"/>
 <input type="submit" value="Insert"/>
 </form>
 
@@ -45,17 +44,16 @@ if (action != null && action.equals("insert")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Student table.
+	// INSERT the courses_taken attrs INTO the courses_taken table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO student VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
+	("INSERT INTO courses_taken VALUES (?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
-	pstmt.setString(2, request.getParameter("first_name"));
-	pstmt.setString(3, request.getParameter("last_name"));
-	pstmt.setString(4, request.getParameter("middle_name"));
-	pstmt.setInt(5, Integer.parseInt(request.getParameter("ssn")));
-	pstmt.setString(6, request.getParameter("enrolled"));
-	pstmt.setString(7, request.getParameter("residential_status"));
-	pstmt.setString(8, request.getParameter("current_degree"));
+	pstmt.setString(2, request.getParameter("course_number"));
+	pstmt.setString(3, request.getParameter("section_id"));
+	pstmt.setInt(4, request.getParameter("year"));
+	pstmt.setInt(5, Integer.parseInt(request.getParameter("unit")));
+	pstmt.setString(6, request.getParameter("grade"));
+	pstmt.setString(7, request.getParameter("professor"));
 	pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
@@ -66,17 +64,16 @@ if (action != null && action.equals("update")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
-	// UPDATE the student attributes in the Student table.
+	// UPDATE the courses taken attributes in the courses_taken table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE student SET first_name = ?, last_name = ?, middle_name = ?, ssn = ?, enrolled = ?, residential_status = ?, current_degree = ? WHERE student_id = ?");	
-	pstmt.setString(1, request.getParameter("first_name"));
-	pstmt.setString(2, request.getParameter("last_name"));
-	pstmt.setString(3, request.getParameter("middle_name"));	
-	pstmt.setInt(4, Integer.parseInt(request.getParameter("ssn")));
-	pstmt.setString(5, request.getParameter("enrolled"));
-	pstmt.setString(6, request.getParameter("residential_status"));
-	pstmt.setString(7, request.getParameter("current_degree"));
-	pstmt.setInt(8,Integer.parseInt(request.getParameter("student_id")));
+	"UPDATE courses_taken SET unit = ?, grade = ?, professor = ? WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");	
+	pstmt.setInt(1, request.getParameter("unit"));
+	pstmt.setString(2, request.getParameter("grade"));
+	pstmt.setString(3, request.getParameter("professor"));	
+	pstmt.setInt(4, Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setString(5, request.getParameter("course_number"));
+	pstmt.setString(6, request.getParameter("section_id"));
+	pstmt.setInt(7,Integer.parseInt(request.getParameter("year")));
 	
 	// out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
@@ -92,10 +89,15 @@ if (action != null && action.equals("delete")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
-	// DELETE the student FROM the Student table.
+	// DELETE the courses_taken FROM the courses_taken table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"DELETE FROM student WHERE student_id = ?");
+	"DELETE FROM courses_taken WHERE student_id = ? AND course_name = ? AND section_id = ? AND year = ?");
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
+    pstmt.setString(1,request.getParameter("course_number"));
+    pstmt.setString(1,request.getParameter("section_id"));
+    pstmt.setInt(1,Integer.parseInt(request.getParameter("year")));
+    
+
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
@@ -107,36 +109,37 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-           ResultSet resultset = statement.executeQuery("select * from student") ;
+           ResultSet resultset = statement.executeQuery("select * from courses_taken") ;
        %>
       <TABLE BORDER="1">
       <TR>
       <TH>student_id</TH>
-      <TH>first_name</TH>
-      <TH>last_name</TH>
-      <TH>middle_name</TH>
-      <TH>ssn</TH>
-      <TH>enrolled</TH>
-      <TH>residential_status</TH>
-      <TH>current_degree</TH>
+      <TH>course_number</TH>
+      <TH>section_id</TH>
+      <TH>year</TH>
+      <TH>unit</TH>
+      <TH>grade</TH>
+      <TH>professor</TH>
       </TR>
       <% while(resultset.next()){ %>
       <TR>
-      <form action="student.jsp" method="get">
+      <form action="courses_taken.jsp" method="get">
       <input type="hidden" value="update" name="action">
       <td><input value="<%= resultset.getInt(1) %>" name="student_id"></td>
-	  <td><input value="<%= resultset.getString(2) %>" name="first_name"></td>      
-      <TD><input value="<%= resultset.getString(3) %>" name="last_name"></TD>
-      <TD><input value="<%= resultset.getString(4) %>" name="middle_name"></TD>
-      <TD><input value="<%= resultset.getInt(5) %>" name="ssn"> </TD>
-      <TD><input value="<%= resultset.getString(6) %>" name="enrolled"></TD>
-      <TD><input value="<%= resultset.getString(7) %>" name="residential_status"> </TD>
-      <TD><input value="<%= resultset.getString(8) %>" name="current_degree"></TD>
+	  <td><input value="<%= resultset.getString(2) %>" name="course_number"></td>      
+      <TD><input value="<%= resultset.getString(3) %>" name="section_id"></TD>
+      <TD><input value="<%= resultset.getInt(4) %>" name="year"></TD>
+      <TD><input value="<%= resultset.getInt(5) %>" name="unit"> </TD>
+      <TD><input value="<%= resultset.getString(6) %>" name="grade"></TD>
+      <TD><input value="<%= resultset.getString(7) %>" name="professor"> </TD>
       <td><input type="submit" value="Update"></td>
       </form>
-       <form action="student.jsp" method="get">
+       <form action="courses_taken.jsp" method="get">
 		<input type="hidden" value="delete" name="action">
 		<input type="hidden" value="<%= resultset.getInt(1) %>" name="student_id">
+		<input type="hidden" value="<%= resultset.getString(2) %>" name="course_number">
+		<input type="hidden" value="<%= resultset.getString(3) %>" name="section_id">
+		<input type="hidden" value="<%= resultset.getInt(1) %>" name="year">
 		<td><input type="submit" value="Delete"></td>
 		</form>
       </TR>
