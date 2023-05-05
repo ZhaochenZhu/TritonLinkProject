@@ -20,6 +20,7 @@ table {
 		<td><a href="class.jsp">class</a></td>
 		<td><a href="degrees.jsp">degrees</a></td>
 		<td><a href="student_probation.jsp">student probation</a></td>  
+		<td><a href="thesis_committee.jsp">thesis committee</a></td>  
       </TR>
 </TABLE>
 
