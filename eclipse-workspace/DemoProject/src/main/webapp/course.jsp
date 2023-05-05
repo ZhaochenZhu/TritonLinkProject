@@ -16,8 +16,8 @@ table {
       <TR>
       <td><a href="student.jsp">student</a></td>
       <td><a href="faculty.jsp">faculty</a></td>
-      <td><a href="course.jsp">course</a></td>
-      
+      <td><a href="course.jsp">faculty</a></td>
+      <td><a href="class.jsp">faculty</a></td>
     </TR>
 </TABLE>
 
@@ -56,11 +56,11 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Course table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE course_info SET course_number = ?, course_name = ?, department = ?, lab_requirement = ?");	
-	pstmt.setString(1, request.getParameter("course_number"));
-	pstmt.setString(2, request.getParameter("course_name"));
-	pstmt.setString(3, request.getParameter("department"));	
-	pstmt.setInt(4, request.getParameter("lab_requirement"));
+	"UPDATE course_info SET course_name = ?, department = ?, lab_requirement = ? WHERE course_number = ?");	
+	pstmt.setString(4, request.getParameter("course_number"));
+	pstmt.setString(1, request.getParameter("course_name"));
+	pstmt.setString(2, request.getParameter("department"));	
+	pstmt.setInt(3, request.getParameter("lab_requirement"));
 	
 	// out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
