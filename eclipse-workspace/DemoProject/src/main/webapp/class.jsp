@@ -14,11 +14,12 @@ table {
 <body>
 <TABLE>
       <TR>
-      <td><a href="student.jsp">student</a></td>
-      <td><a href="faculty.jsp">faculty</a></td>
-      <td><a href="course.jsp">faculty</a></td>
-      <td><a href="class.jsp">faculty</a></td>
-      <td><a href="degrees.jsp">faculty</a></td>
+        <td><a href="student.jsp">student</a></td>
+        <td><a href="faculty.jsp">faculty</a></td>
+        <td><a href="course.jsp">course</a></td>
+        <td><a href="class.jsp">class</a></td>
+        <td><a href="degrees.jsp">degrees</a></td>
+        <td><a href="student_probation.jsp">student probation</a></td>  
       </TR>
 </TABLE>
 
@@ -65,7 +66,7 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Student table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE section SET quarter = ?, units = ?, start_date = ?, end_date = ?, professor = ? WHERE year = ?, section_id = ?, course_number = ?");	
+	"UPDATE section SET quarter = ?, units = ?, start_date = ?, end_date = ?, professor = ? WHERE year = ? AND section_id = ? AND course_number = ?");	
 	pstmt.setString(1, request.getParameter("quartere"));
     pstmt.setInt(2, Integer.parseInt(request.getParameter("units")));
 	pstmt.setString(3, request.getParameter("start_date"));
@@ -91,7 +92,7 @@ if (action != null && action.equals("delete")) {
 	// Create the prepared statement and use it to
 	// DELETE the class FROM the section table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"DELETE FROM section WHERE year = ?, section_id = ?, course_number = ?");
+	"DELETE FROM section WHERE year = ? AND section_id = ? AND course_number = ?");
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
 	pstmt.setString(2, request.getParameter("section_id"));
 	pstmt.setString(3, request.getParameter("course_number"));
@@ -106,7 +107,7 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-           ResultSet resultset = statement.executeQuery("select * from sectiont") ;
+           ResultSet resultset = statement.executeQuery("select * from section") ;
        %>
       <TABLE BORDER="1">
       <TR>
@@ -121,7 +122,7 @@ if (action != null && action.equals("delete")) {
       </TR>
       <% while(resultset.next()){ %>
       <TR>
-      <form action="student.jsp" method="get">
+      <form action="class.jsp" method="get">
       <input type="hidden" value="update" name="action">
       <td><input value="<%= resultset.getInt(1) %>" name="year"></td>
 	  <td><input value="<%= resultset.getString(2) %>" name="section_id"></td>      
@@ -136,9 +137,9 @@ if (action != null && action.equals("delete")) {
        <form action="class.jsp" method="get">
 		<input type="hidden" value="delete" name="action">
 		<input type="hidden" value="<%= resultset.getInt(1) %>" name="year">
-        <td><input value="<%= resultset.getString(2) %>" name="section_id"></td>      
-        <TD><input value="<%= resultset.getString(3) %>" name="course_number"></TD>  
-		<td><input type="submit" value="Delete"></td>
+        <input type="hidden" value="<%= resultset.getString(2) %>" name="section_id">     
+        <input type="hidden" value="<%= resultset.getString(3) %>" name="course_number">
+        <td><input type="submit" value="Delete"></td>
 		</form>
       </TR>
       <% } %>

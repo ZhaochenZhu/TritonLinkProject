@@ -14,11 +14,12 @@ table {
 <body>
 <TABLE>
       <TR>
-      <td><a href="student.jsp">student</a></td>
-      <td><a href="faculty.jsp">faculty</a></td>
-      <td><a href="course.jsp">faculty</a></td>
-      <td><a href="class.jsp">faculty</a></td>
-      <td><a href="degrees.jsp">faculty</a></td>
+        <td><a href="student.jsp">student</a></td>
+        <td><a href="faculty.jsp">faculty</a></td>
+        <td><a href="course.jsp">course</a></td>
+        <td><a href="class.jsp">class</a></td>
+        <td><a href="degrees.jsp">degrees</a></td>
+        <td><a href="student_probation.jsp">student probation</a></td>  
     </TR>
 </TABLE>
 
@@ -61,7 +62,7 @@ if (action != null && action.equals("update")) {
 	pstmt.setString(4, request.getParameter("course_number"));
 	pstmt.setString(1, request.getParameter("course_name"));
 	pstmt.setString(2, request.getParameter("department"));	
-	pstmt.setInt(3, request.getParameter("lab_requirement"));
+	pstmt.setString(3, request.getParameter("lab_requirement"));
 	
 	// out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
@@ -80,7 +81,7 @@ if (action != null && action.equals("delete")) {
 	// DELETE the student FROM the Course table.
 	PreparedStatement pstmt = conn.prepareStatement(
 	"DELETE FROM course_info WHERE course_number = ?");
-	pstmt.setInt(1,request.getParameter("course_number"));
+	pstmt.setString(1,request.getParameter("course_number"));
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
@@ -103,7 +104,7 @@ if (action != null && action.equals("delete")) {
       </TR>
       <% while(resultset.next()){ %>
       <TR>
-      <form action="student.jsp" method="get">
+      <form action="course.jsp" method="get">
       <input type="hidden" value="update" name="action">
       <td><input value="<%= resultset.getString(1) %>" name="course_number"></td>
 	  <td><input value="<%= resultset.getString(2) %>" name="course_name"></td>      
@@ -113,7 +114,7 @@ if (action != null && action.equals("delete")) {
       </form>
        <form action="course.jsp" method="get">
 		<input type="hidden" value="delete" name="action">
-		<input type="hidden" value="<%= resultset.getInt(1) %>" name="course_number">
+		<input type="hidden" value="<%= resultset.getString(1) %>" name="course_number">
 		<td><input type="submit" value="Delete"></td>
 		</form>
       </TR>

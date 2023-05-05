@@ -8,7 +8,7 @@ public class DegreesDAO {
         int status = 0;
 		try {
 			conn = ConnectionProvider.getCon();
-			pst=conn.prepareStatement("insert into student values(?,?,?,?,?,?,?,?)");
+			pst=conn.prepareStatement("insert into student values(?,?,?,?,?)");
 			pst.setString(1, d.getMajor());
             pst.setString(2, d.getType());
 			pst.setString(3, d.getCategory());
