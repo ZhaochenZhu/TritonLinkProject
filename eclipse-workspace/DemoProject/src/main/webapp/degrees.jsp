@@ -16,9 +16,9 @@ table {
       <TR>
       <td><a href="student.jsp">student</a></td>
       <td><a href="faculty.jsp">faculty</a></td>
-	  <td><a href="course.jsp">faculty</a></td>
-      <td><a href="class.jsp">faculty</a></td>
-      <td><a href="degrees.jsp">faculty</a></td>
+	  <td><a href="course.jsp">course</a></td>
+      <td><a href="class.jsp">class</a></td>
+	  <td><a href="degrees.jsp">degrees</a></td>
       </TR>
 </TABLE>
 
@@ -59,7 +59,7 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the general_unit_requirement attributes in the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE general_unit_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ?, type = ?, category = ?");	
+	"UPDATE general_unit_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND type = ? AND category = ?");	
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
     pstmt.setString(2, request.getParameter("minimum_grade"));
 	pstmt.setString(3, request.getParameter("major"));	
@@ -82,7 +82,7 @@ if (action != null && action.equals("delete")) {
 	// Create the prepared statement and use it to
 	// DELETE the general_unit_requirement FROM the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"DELETE FROM general_unit_requirement WHERE major = ?, type = ?, category = ?");
+	"DELETE FROM general_unit_requirement WHERE major = ? AND type = ? AND category = ?");
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("type"));
 	pstmt.setString(3, request.getParameter("category"));
@@ -112,7 +112,7 @@ if (action != null && action.equals("delete")) {
       <form action="degrees.jsp" method="get">
       <input type="hidden" value="update" name="action">
       <td><input value="<%= resultset.getString(1) %>" name="major"></td>      
-      <TD><input value="<%= resultset.getString(2) %>" name="type"></TD>
+      <TD><input value="<%= resultset.getString(2) %>" name="type" ></TD>
       <TD><input value="<%= resultset.getString(3) %>" name="category"></TD>
       <TD><input value="<%= resultset.getInt(4) %>" name="minimum_unit"> </TD>
       <TD><input value="<%= resultset.getString(5) %>" name="minimum_grade"></TD>
@@ -120,10 +120,10 @@ if (action != null && action.equals("delete")) {
       </form>
        <form action="degrees.jsp" method="get">
 		<input type="hidden" value="delete" name="action">
-		<td><input value="<%= resultset.getString(1) %>" name="major"></td>      
-        <TD><input value="<%= resultset.getString(2) %>" name="type"></TD>
-        <TD><input value="<%= resultset.getString(3) %>" name="category"></TD>
-        <td><input type="submit" value="Delete"></td>
+		<input type="hidden" value="<%= resultset.getString(1) %>" name="major">     
+        <input type="hidden" value="<%= resultset.getString(2) %>" name="type">
+        <input type="hidden" value="<%= resultset.getString(3) %>" name="category">
+        <TD><input type="submit" value="Delete"></TD>
 		</form>
       </TR>
       <% } %>

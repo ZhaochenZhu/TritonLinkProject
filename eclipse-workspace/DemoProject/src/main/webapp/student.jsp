@@ -16,9 +16,9 @@ table {
       <TR>
       <td><a href="student.jsp">student</a></td>
       <td><a href="faculty.jsp">faculty</a></td>
-	  <td><a href="course.jsp">faculty</a></td>
-      <td><a href="class.jsp">faculty</a></td>
-	  <td><a href="degrees.jsp">faculty</a></td>
+	  <td><a href="course.jsp">course</a></td>
+      <td><a href="class.jsp">class</a></td>
+	  <td><a href="degrees.jsp">degrees</a></td>
       </TR>
 </TABLE>
 
