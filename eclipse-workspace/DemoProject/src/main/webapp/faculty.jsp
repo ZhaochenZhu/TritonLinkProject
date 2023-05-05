@@ -16,7 +16,8 @@ table {
       <TR>
       <td><a href="student.jsp">student</a></td>
       <td><a href="faculty.jsp">faculty</a></td>
-      </TR>
+	  <td><a href="course.jsp">course</a></td>  
+	</TR>
 </TABLE>
 
 <H1>Adding Faculty</H1>
