@@ -19,6 +19,8 @@ table {
 	  <td><a href="course.jsp">course</a></td>
       <td><a href="class.jsp">class</a></td>
 	  <td><a href="degrees.jsp">degrees</a></td>
+	  <td><a href="student_course_enroll.jsp">Webreg</a></td>
+	  <td><a href="review_session.jsp">review_session</a></td>
       </TR>
 </TABLE>
 
