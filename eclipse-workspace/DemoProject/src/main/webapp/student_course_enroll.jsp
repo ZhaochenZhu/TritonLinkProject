@@ -98,7 +98,7 @@ Course number: <input type="text" name="course_number"/>
 <%
 String action = request.getParameter("action");
 ResultSet preqs = null;
-if (action != null && action.equals("check_prereq")) {
+if (action != null && (action.equals("check_prereq")||action.equals("enroll_class"))) {
 	search = true;
 	//student_id = Integer.parseInt(request.getParameter("student_id"));
 	Connection conn = ConnectionProvider.getCon();
@@ -114,6 +114,7 @@ if (action != null && action.equals("check_prereq")) {
 	//conn.close();
 }
 if (action != null && action.equals("enroll_class")) {
+	try{
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
@@ -157,9 +158,10 @@ if (action != null && action.equals("enroll_class")) {
 	else{
 		out.println("Pre-req not statisfied");
 	}
-	//conn.commit();
 	conn.setAutoCommit(true);
-	//conn.close();
+	}catch(Exception ex){
+		out.println(ex.getClass().getSimpleName());
+	}
 }
 
 %>
