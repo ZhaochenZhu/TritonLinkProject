@@ -14,14 +14,7 @@ table {
 <body>
 <TABLE>
       <TR>
-        <td><a href="student.jsp">student</a></td>
-        <td><a href="faculty.jsp">faculty</a></td>
-        <td><a href="course.jsp">course</a></td>
-        <td><a href="class.jsp">class</a></td>
-        <td><a href="degrees.jsp">degrees</a></td>
-        <td><a href="student_probation.jsp">student probation</a></td>  
-        <td><a href="thesis_committee.jsp">thesis committee</a></td>  
-        <td><a href="courses_taken.jsp">courses taken</a></td>  
+        <td><a href="root.jsp">Go Back</a></td>
     </TR>
 </TABLE>
 
