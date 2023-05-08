@@ -51,6 +51,7 @@ if (action != null && action.equals("insert")) {
 }
 
 //TODO what is cannot update can only delete and add new?
+/**
 if (action != null && action.equals("update")) {
 	try{
 	Connection conn = ConnectionProvider.getCon();
@@ -58,7 +59,7 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the general_unit_requirement attributes in the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE general_unit_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND type = ? AND category = ?");	
+	"UPDATE thesis_committee SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND type = ? AND category = ?");	
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
     pstmt.setString(2, request.getParameter("minimum_grade"));
 	pstmt.setString(3, request.getParameter("major"));	
@@ -74,7 +75,7 @@ if (action != null && action.equals("update")) {
 	}catch(Exception ex){
 		System.out.println(ex);
 	}
-}
+}**/
 if (action != null && action.equals("delete")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
@@ -108,7 +109,7 @@ if (action != null && action.equals("delete")) {
       <input type="hidden" value="update" name="action">
       <TD><input value="<%= resultset.getInt(1) %>" name="student_id"> </TD>
       <td><input value="<%= resultset.getString(2) %>" name="faculty_name"></td>      
-      <td><input type="submit" value="Update"></td>
+      <td><input type="hidden" value="Update"></td>
       </form>
        <form action="thesis_committee.jsp" method="get">
 		<input type="hidden" value="delete" name="action">

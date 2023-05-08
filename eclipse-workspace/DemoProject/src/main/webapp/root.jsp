@@ -18,7 +18,7 @@
 	  <tr><td><a href="review_session.jsp">review_session</a></td></tr>
       <tr><td><a href="student_probation.jsp">student probation</a></td></tr> 
       <tr><td><a href="thesis_committee.jsp">thesis committee</a></td></tr>  
-      <tr><td><a href="courses_taken.jsp">courses taken</a></td></tr>  
+      <tr><td><a href="course_taken.jsp">courses taken</a></td></tr>  
       
 </TABLE>
 </body>
