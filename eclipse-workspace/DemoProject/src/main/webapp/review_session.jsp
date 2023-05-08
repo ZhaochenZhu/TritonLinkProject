@@ -5,7 +5,7 @@
 <head>
 <style>
 table { 
-	border-collapse: separate; border-spacing: 5px; 
+ border-collapse: separate; border-spacing: 5px; 
 }
 </style>
 <meta charset="UTF-8">
@@ -14,15 +14,13 @@ table {
 <body>
 <TABLE>
       <TR>
-		<td><a href="student.jsp">student</a></td>
-		<td><a href="faculty.jsp">faculty</a></td>
-		<td><a href="course.jsp">course</a></td>
-		<td><a href="class.jsp">class</a></td>
-		<td><a href="degrees.jsp">degrees</a></td>
-		<td><a href="student_probation.jsp">student probation</a></td>  
-		<td><a href="thesis_committee.jsp">thesis committee</a></td>  
-		<td><a href="courses_taken.jsp">courses taken</a></td>  
-        <td><a href="review_session.jsp">review session</a></td>
+<td><a href="student.jsp">student</a></td>
+      <td><a href="faculty.jsp">faculty</a></td>
+	  <td><a href="course.jsp">course</a></td>
+      <td><a href="class.jsp">class</a></td>
+	  <td><a href="degrees.jsp">degrees</a></td>
+	  <td><a href="student_course_enroll.jsp">Webreg</a></td>
+	  <td><a href="review_session.jsp">review_session</a></td>
     </TR>
 </TABLE>
 
@@ -44,64 +42,62 @@ end time: <input type="text" name="end_time" size="20"/>
 <%
 String action = request.getParameter("action");
 if (action != null && action.equals("insert")) {
-	Connection conn = ConnectionProvider.getCon();
-	conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the review session attrs INTO the class_meetings_time table.
-	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO class_meetings_time VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
-	pstmt.setInt(1, Integer.parseInt(request.getParameter("year")));
+ Connection conn = ConnectionProvider.getCon();
+ conn.setAutoCommit(false);
+ // Create the prepared statement and use it to
+ // INSERT the review session attrs INTO the class_meetings_time table.
+ PreparedStatement pstmt = conn.prepareStatement(
+ ("INSERT INTO class_meetings_times VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
+ pstmt.setInt(1, Integer.parseInt(request.getParameter("year")));
     pstmt.setString(2,request.getParameter("section_id"));
-	pstmt.setString(3, request.getParameter("course_number"));
+ 	pstmt.setString(3, request.getParameter("course_number"));
     pstmt.setString(4, "review_session");
     pstmt.setString(5, request.getParameter("day"));
     pstmt.setString(6, request.getParameter("date"));    
     pstmt.setString(7, request.getParameter("start_time"));
     pstmt.setString(8, request.getParameter("end_time"));
-	pstmt.executeUpdate();
-	conn.commit();
-	conn.setAutoCommit(true);
-	conn.close();
+ pstmt.executeUpdate();
+ conn.commit();
+ conn.setAutoCommit(true);
+ conn.close();
 }
 if (action != null && action.equals("update")) {
-	Connection conn = ConnectionProvider.getCon();
-	conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// UPDATE the student attributes in the Student table.
-	PreparedStatement pstatement = conn.prepareStatement(
-	"UPDATE class_meetings_time SET start_time = ?, end_time = ? WHERE year = ? AND section_id = ? AND course_number = ? AND type = ? AND day = ? AND date = ?");
-	pstatement.setString(1, request.getParameter("start_time"));
-	pstatement.setString(2, request.getParameter("end_time"));
-	pstmt.setInt(3, Integer.parseInt(request.getParameter("year")));
-    pstmt.setString(4,request.getParameter("section_id"));
-	pstmt.setString(5, request.getParameter("course_number"));
-    pstmt.setString(6, "review_session");
-    
-    pstmt.setString(7, request.getParameter("day"));
-    pstmt.setString(8, request.getParameter("date"));    
-    
-    int rowCount = pstatement.executeUpdate();
-	conn.commit();
-	conn.setAutoCommit(true);
-	conn.close();
+ Connection conn = ConnectionProvider.getCon();
+ conn.setAutoCommit(false);
+ // Create the prepared statement and use it to
+ // UPDATE the student attributes in the Student table.
+ PreparedStatement pstatement = conn.prepareStatement(
+ "UPDATE class_meetings_times SET start_time = ?, end_time = ? WHERE year = ? AND section_id = ? AND course_number = ? AND type = ? AND day = ? AND date = ?");
+ pstatement.setString(1, request.getParameter("start_time"));
+ pstatement.setString(2, request.getParameter("end_time"));
+ pstatement.setInt(3, Integer.parseInt(request.getParameter("year")));
+ pstatement.setString(4,request.getParameter("section_id"));
+ pstatement.setString(5, request.getParameter("course_number"));
+ pstatement.setString(6, request.getParameter("type"));    
+ pstatement.setString(7, request.getParameter("day"));
+ pstatement.setString(8, request.getParameter("date"));    
+ int rowCount = pstatement.executeUpdate();
+ conn.commit();
+ conn.setAutoCommit(true);
+ conn.close();
 }
 if (action != null && action.equals("delete")) {
-	Connection conn = ConnectionProvider.getCon();
-	conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// DELETE the student FROM the Student table.
-	PreparedStatement pstmt = conn.prepareStatement(
-	"DELETE FROM class_meetings_time WHERE year = ? AND section_id = ? AND course_number = ? AND type = ? AND day = ? AND date = ?");
-	pstmt.setInt(1, Integer.parseInt(request.getParameter("year")));
-    pstmt.setString(2,request.getParameter("section_id"));
-	pstmt.setString(3, request.getParameter("course_number"));
-    pstmt.setString(4, "review_session");
-    pstmt.setString(5, request.getParameter("day"));
-    pstmt.setString(6, request.getParameter("date"));    
-    int rowCount = pstmt.executeUpdate();
-	conn.commit();
-	conn.setAutoCommit(true);
-	conn.close();
+ Connection conn = ConnectionProvider.getCon();
+ conn.setAutoCommit(false);
+ // Create the prepared statement and use it to
+ // DELETE the student FROM the Student table.
+ PreparedStatement pstmt = conn.prepareStatement(
+ "DELETE FROM class_meetings_times WHERE year = ? AND section_id = ? AND course_number = ? AND type = ? AND day = ? AND date = ?");
+ pstmt.setInt(1, Integer.parseInt(request.getParameter("year")));
+ pstmt.setString(2,request.getParameter("section_id"));
+ pstmt.setString(3, request.getParameter("course_number"));
+ pstmt.setString(4, "review_session");
+ pstmt.setString(5, request.getParameter("day"));
+ pstmt.setString(6, request.getParameter("date"));
+ int rowCount = pstmt.executeUpdate();
+ conn.commit();
+ conn.setAutoCommit(true);
+ conn.close();
 }
 
 %><br><br>
@@ -110,35 +106,44 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-          ResultSet resultset = statement.executeQuery("select * from class_meetings_time WHERE type = "review_session"") ;
+          ResultSet resultset = statement.executeQuery("select * from class_meetings_times WHERE type = 'review_session'") ;
        %>
       <TABLE BORDER="1">
       <TR>
-      <TH>Review Sessions</TH>
-      <TH>title</TH>
+      <TH>Year</TH>
+      <TH>Course Number</TH>
+      <TH>Section ID</TH>
+      <TH>Days of Week</TH>
+      <TH>Date</TH>
+      <TH>Start Time</TH>
+      <TH>End Time</TH>
       </TR>
       <% while(resultset.next()){ %>
-      	<tr>
-		<form action="review_session.jsp" method="get">
-		<input type="hidden" value="update" name="action">
-		<td><input value="<%= resultset.getInt(1) %>" name="year"></td>
-		<td><input value="<%= resultset.getString(2) %>" name="section_id"></td>
-        <td><input value="<%= resultset.getString(3) %>" name="course_number"></td>
-        <td><input value="<%= resultset.getString(4) %>" name="day"></td>
-        <td><input value="<%= resultset.getString(5) %>" name="date"></td>
-		<td><input type="submit" value="Update"></td>
-		</form>
-		<form action="review_session.jsp" method="get">
-		<input type="hidden" value="delete" name="action">
-		<input type="hidden" value="<%= resultset.getInt(1) %>" name="year">
+       <tr>
+  <form action="review_session.jsp" method="get">
+  <input type="hidden" value="update" name="action">
+  <td><input value="<%= resultset.getInt(1) %>" name="year"></td>
+  <td><input value="<%= resultset.getString(3) %>" name="course_number"></td>
+  <td><input value="<%= resultset.getString(2) %>" name="section_id"></td>
+  <input type="hidden" value="<%= resultset.getString(4) %>" name="type">
+  <td><input value="<%= resultset.getString(5) %>" name="day"></td>
+  <td><input value="<%= resultset.getString(6) %>" name="date"></td>
+  <td><input value="<%= resultset.getString(7) %>" name="start_time"></td>
+  <td><input value="<%= resultset.getString(8) %>" name="end_time"></td>
+  <td><input type="submit" value="Update"></td>
+  </form>
+  <form action="review_session.jsp" method="get">
+  <input type="hidden" value="delete" name="action">
+  <input type="hidden" value="<%= resultset.getInt(1) %>" name="year">
         <input type="hidden" value="<%= resultset.getString(2) %>" name="section_id">
         <input type="hidden" value="<%= resultset.getString(3) %>" name="course_number">
-        <input type="hidden" value="<%= resultset.getString(4) %>" name="day">
-        <input type="hidden" value="<%= resultset.getString(5) %>" name="date">
+        <input type="hidden" value="<%= resultset.getString(5) %>" name="day">
+        <input type="hidden" value="<%= resultset.getString(6) %>" name="date">
+        <input type="hidden" value="<%= resultset.getString(4) %>" name="type">
         
-		<td><input type="submit" value="Delete"></td>
-		</form>
-		</tr>
+  <td><input type="submit" value="Delete"></td>
+  </form>
+  </tr>
       <% } %>
      </TABLE>
 

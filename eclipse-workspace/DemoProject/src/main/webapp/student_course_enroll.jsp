@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="java.sql.*, com.mit.*"%>
+    pageEncoding="UTF-8" import="java.sql.*, com.mit.*, java.util.*"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,58 +20,176 @@ table {
       <td><a href="class.jsp">class</a></td>
 	  <td><a href="degrees.jsp">degrees</a></td>
 	  <td><a href="student_course_enroll.jsp">Webreg</a></td>
+	  <td><a href="review_session.jsp">review_session</a></td>
       </TR>
 </TABLE>
 
 <H1>Enroll course</H1>
+<table>
 <TR>
+<TD>
 <form name = "f1" method="get">
 <input type="hidden" value="check_prereq" name="action"/>
 Student ID: <input type="text" name="student_id" />
 Course number: <input type="text" name="course_number"/>
-<input type="submit" value="Check prereq"/>
+<input type="submit" value="Search Class"/>
 </form>
+</TD>
+<%-- 
+<TD>
 </form>
 <form action="student_course_enroll.jsp" method="get">
 <input type="hidden" value="enroll_class" name="action">
 <input type="hidden" value=student_id name="student_id">
 <td><input type="submit" value="Enroll"></td>
 </form>
+</TD> --%>
 </TR>
+</table>
+<h2>Class Info</h2>
+<%
+	Connection connection = ConnectionProvider.getCon();
+	PreparedStatement pstmt = connection.prepareStatement(
+		"SELECT * From section WHERE course_number = ? AND year = 2023 AND quarter ='SP'");
+	pstmt.setString(1, request.getParameter("course_number"));
+	ResultSet section = pstmt.executeQuery();
+	boolean search = false;
+	//int student_id = -1;
+%>
+<TABLE BORDER="1">
+      <TR>
+      <TH>Course</TH>
+      <TH>Section ID</TH>
+      <TH>Professor</TH>
+      <th>Units</th>
+      <TH>Start Date</TH>
+      <TH>End Date</TH>
+      </TR>
+      <% if(section!=null){
+    	  boolean found = false;
+      while(section.next()){ 
+      found = true;%>
+      <TR>
+      <form action="student_course_enroll.jsp" method="get">
+      <input type="hidden" value="update" name="action">
+      <td><%= section.getString(3) %></td>
+	  <td><%= section.getString(2) %></td>      
+      <TD><%= section.getString(8) %></TD>
+      <TD><%= section.getInt(5) %></TD>
+      <TD><%= section.getString(6) %> </TD>
+      <TD><%= section.getString(7) %></TD>
+      </form>
+      <form action="student_course_enroll.jsp" method="get">
+		<input type="hidden" value="enroll_class" name="action">
+		<input type="hidden" value="<%= section.getInt(1) %>" name="year">
+		<input type="hidden" value="<%= section.getString(2) %>" name="section_id">
+		<input type="hidden" value="<%= section.getString(3) %>" name="course_number">
+		<input type="hidden" value="<%= section.getInt(5) %>" name="units">
+		<input type="hidden" value="<%= request.getParameter("student_id") %>" name="student_id">
+		<td><input type="submit" value="Enroll"></td>
+		</form>
+      </TR>
+      <% }
+      if(!found&&search) out.println("Course not offered in current quarter");
+      }%>
+     </TABLE>
+
+
 <%
 String action = request.getParameter("action");
 ResultSet preqs = null;
-if (action != null && action.equals("check_prereq")) {
+if (action != null && (action.equals("check_prereq")||action.equals("enroll_class"))) {
+	search = true;
 	Connection conn = ConnectionProvider.getCon();
 	//conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
-	PreparedStatement pstmt = conn.prepareStatement(
+	pstmt = conn.prepareStatement(
 	("SELECT * FROM prerequisite WHERE course_number = ?"));
 	pstmt.setString(1,request.getParameter("course_number"));
 	preqs = pstmt.executeQuery();
-	//conn.commit();
-	//conn.setAutoCommit(true);
-	//conn.close();
 }
+
+if (action != null && action.equals("drop_course")) {
+	search = true;
+	try{
+	Connection conn = ConnectionProvider.getCon();
+	conn.setAutoCommit(false);
+	//conn.setAutoCommit(false);
+	// Create the prepared statement and use it to
+	// INSERT the student attrs INTO the Student table.
+	pstmt = conn.prepareStatement(
+	("Delete FROM enrollment_list_of_class WHERE year = ? AND section_id = ? AND course_number = ? AND student_id = ?"));
+	pstmt.setInt(1,Integer.parseInt(request.getParameter("year")));
+	pstmt.setString(2,request.getParameter("section_id"));
+	pstmt.setString(3,request.getParameter("course_number"));
+	pstmt.setInt(4,Integer.parseInt(request.getParameter("student_id")));
+	//out.println(pstmt.toString());
+	int rowCount = pstmt.executeUpdate();
+	conn.commit();
+	conn.setAutoCommit(true);
+	}catch(Exception ex){
+		out.println(ex);
+	}
+}
+
 if (action != null && action.equals("enroll_class")) {
+	try{
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
-	PreparedStatement pstmt = conn.prepareStatement(
-	("SELECT * FROM prerequisite WHERE course_number = ?"));
-	pstmt.setString(1,request.getParameter("course_number"));
-	preqs = pstmt.executeQuery();
-	//conn.commit();
+	
+	// check for prereq
+	Statement stmt = connection.createStatement() ;
+	String query = "select * from prerequisite WHERE course_number = '"+
+			request.getParameter("course_number")+"'";
+	ResultSet resultset = stmt.executeQuery(query);
+	List<String> pre_reqs = new ArrayList<>();
+	while(resultset.next()){
+		pre_reqs.add(resultset.getString(2));
+	}
+	//out.println(pre_reqs.size());
+	query = "select * from courses_taken WHERE student_id = "+request.getParameter("student_id");
+	resultset = stmt.executeQuery(query);
+	//out.println(student_id);
+	while(resultset.next()){
+		//System.err.println(resultset.getString(2));
+		for(int i=0;i<pre_reqs.size();i++){
+			if(pre_reqs.get(i).equals(resultset.getString(2))){
+				pre_reqs.remove(i);
+				break;
+			}
+		}
+	}
+	if(pre_reqs.isEmpty()){
+		// can enroll in course
+		pstmt = conn.prepareStatement(
+		("INSERT INTO enrollment_list_of_class VALUES (?, ?, ?, ?, ?)"));
+		pstmt.setInt(1,2023);
+		pstmt.setString(2,request.getParameter("section_id"));
+		pstmt.setString(3,request.getParameter("course_number"));
+		pstmt.setInt(4,Integer.parseInt(request.getParameter("student_id")));
+		pstmt.setString(5,request.getParameter("units"));
+		pstmt.executeUpdate();
+		conn.commit();
+		out.println("Enrolled");
+	}
+	else{
+		out.println("Pre-req not statisfied");
+	}
 	conn.setAutoCommit(true);
-	//conn.close();
+	}catch(Exception ex){
+		out.println(ex.getClass().getSimpleName());
+	}
 }
 
 %>
-<TABLE BORDER="1">
+
+	<h2>Prerequisite of <%= (request.getParameter("course_number")==null)? "course (Type in course_number to show)":request.getParameter("course_number") %></h2>
+	<TABLE BORDER="1">
       <TR>
-      <TH>Prerequisites</TH>
+      <TH>Course</TH>
       <TH>Taken?</TH>
       </TR>
       <% if(preqs!=null){
@@ -81,7 +199,7 @@ if (action != null && action.equals("enroll_class")) {
       <%
       Connection conn = ConnectionProvider.getCon();
       String requiredCourse = preqs.getString(2);
-      PreparedStatement pstmt = conn.prepareStatement(
+      pstmt = conn.prepareStatement(
     			("SELECT * FROM courses_taken WHERE course_number = ? AND student_id = ?"));
       pstmt.setString(1, preqs.getString(2));
       pstmt.setInt(2,Integer.parseInt(request.getParameter("student_id")));
@@ -89,6 +207,43 @@ if (action != null && action.equals("enroll_class")) {
       String taken = rst.next()? "Yes":"No";
       %>
       <td><%= taken%></td>
+      </TR>
+      <% }
+      }%>
+     </TABLE>
+     
+     <h2>Enrolled course of <%= (request.getParameter("student_id")==null)? "student (Type in student_id to show)":request.getParameter("student_id")%></h2>
+	<TABLE BORDER="1">
+	<%
+	  
+      Connection conn = ConnectionProvider.getCon();
+      pstmt = conn.prepareStatement(
+    			("SELECT * FROM enrollment_list_of_class WHERE student_id = ?"));
+      ResultSet enrolled_course;
+      if(search){
+    	  pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
+    	  enrolled_course = pstmt.executeQuery();
+      }else{
+    	  enrolled_course = null;
+      }
+      
+      %>
+      <TR>
+      <TH>Course</TH>
+      <TH>Section ID</TH>
+      <th>Grading_option</th>
+      </TR>
+      <% if(enrolled_course!=null){
+      while(enrolled_course.next()){ %>
+      <TR>
+      <form action="student_course_enroll.jsp" method="get">
+      <input type="hidden" value="drop_course" name="action">
+      <td><input value="<%= enrolled_course.getString(3) %>" name="course_number"></td>
+	  <td><input value="<%= enrolled_course.getString(2) %>" name="section_id"></td>      
+      <TD><input value="<%= enrolled_course.getString(5) %>" name="grading_option"></TD>
+      <input type="hidden" value="<%= enrolled_course.getInt(1) %>" name="year">
+      <input type="hidden" value="<%= enrolled_course.getInt(4) %>" name="student_id">
+		<td><input type="submit" value="Drop"></td>
       </TR>
       <% }
       }%>
