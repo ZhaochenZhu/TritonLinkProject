@@ -14,7 +14,14 @@ table {
 <body>
 <TABLE>
       <TR>
-		<td><a href="root.jsp">Go Back</a></td>
+		<td><a href="student.jsp">student</a></td>
+        <td><a href="faculty.jsp">faculty</a></td>
+        <td><a href="course.jsp">course</a></td>
+        <td><a href="class.jsp">class</a></td>
+        <td><a href="degrees.jsp">degrees</a></td>
+        <td><a href="student_probation.jsp">student probation</a></td>  
+        <td><a href="thesis_committee.jsp">thesis committee</a></td>  
+        <td><a href="courses_taken.jsp">courses taken</a></td>  
     </TR>
 </TABLE>
 
@@ -78,7 +85,7 @@ if (action != null && action.equals("delete")) {
 	// DELETE the general_unit_requirement FROM the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
 	"DELETE FROM thesis_committee WHERE student_id = ? AND faculty_name = ?");
-	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setInt(1, request.getParameter("student_id"));
 	pstmt.setString(2, request.getParameter("faculty_name"));
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
