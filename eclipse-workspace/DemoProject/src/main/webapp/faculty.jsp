@@ -153,7 +153,7 @@ if (action != null && action.equals("delete_dpt")) {
       <% } %>
      </TABLE>
 
-<H1>Current Faculty</H1>
+<H1>Faculty-Department</H1>
        <%
            connection = ConnectionProvider.getCon();
            Statement statement_dpt = connection.createStatement() ;
