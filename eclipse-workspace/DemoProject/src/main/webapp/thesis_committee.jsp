@@ -28,11 +28,8 @@ table {
 <H1>Adding Degree</H1>
 <form name = "f1" method="get">
 <input type="hidden" value="insert" name="action">
-Major: <input type="text" name="major" size="5"/>
-Type: <input type="text" name="type" size="5"/>
-Category: <input type="text" name="category" size="5"/>
-Minimum unit: <input type="text" name="minimum_unit" size="2"/>
-Minimum grade: <input type="text" name="minimum_grade" size="5"/>
+Student_id: <input type="text" name="student_id" size="5"/>
+Professor: <input type="text" name="faculty_name" size="5"/>
 <input type="submit" value="Insert"/>
 </form>
 
@@ -40,17 +37,24 @@ Minimum grade: <input type="text" name="minimum_grade" size="5"/>
 String action = request.getParameter("action");
 if (action != null && action.equals("insert")) {
 	Connection conn = ConnectionProvider.getCon();
-	conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the thesis_committee attrs INTO the thesis_committee table.
-	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO thesis_committee VALUES (?, ?)"));
-	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
-    pstmt.setString(2, request.getParameter("faculty_name"));
-	pstmt.executeUpdate();
-	conn.commit();
-	conn.setAutoCommit(true);
-	conn.close();
+	Statement statement = conn.createStatement() ;
+    ResultSet resultset = statement.executeQuery("select * from phd_student WHERE student_id = "+Integer.parseInt(request.getParameter("student_id"))); ;
+	if(resultset.next() && resultset.getString(2).equals("Yes")){
+		conn.setAutoCommit(false);
+		// Create the prepared statement and use it to
+		// INSERT the thesis_committee attrs INTO the thesis_committee table.
+		PreparedStatement pstmt = conn.prepareStatement(
+		("INSERT INTO thesis_committee VALUES (?, ?)"));
+		pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
+	    pstmt.setString(2, request.getParameter("faculty_name"));
+		pstmt.executeUpdate();
+		conn.commit();
+		conn.setAutoCommit(true);
+		conn.close();
+	}else{
+		out.println("Not a candidate!");
+	}
+	
 }
 
 //TODO what is cannot update can only delete and add new?
