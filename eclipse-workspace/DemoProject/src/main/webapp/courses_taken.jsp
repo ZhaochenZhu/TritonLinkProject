@@ -50,7 +50,7 @@ if (action != null && action.equals("insert")) {
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
 	pstmt.setString(2, request.getParameter("course_number"));
 	pstmt.setString(3, request.getParameter("section_id"));
-	pstmt.setInt(4, request.getParameter("year"));
+	pstmt.setInt(4, Integer.parseInt(request.getParameter("year")));
 	pstmt.setInt(5, Integer.parseInt(request.getParameter("unit")));
 	pstmt.setString(6, request.getParameter("grade"));
 	pstmt.setString(7, request.getParameter("professor"));
@@ -67,7 +67,7 @@ if (action != null && action.equals("update")) {
 	// UPDATE the courses taken attributes in the courses_taken table.
 	PreparedStatement pstmt = conn.prepareStatement(
 	"UPDATE courses_taken SET unit = ?, grade = ?, professor = ? WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");	
-	pstmt.setInt(1, request.getParameter("unit"));
+	pstmt.setInt(1, Integer.parseInt(request.getParameter("unit")));
 	pstmt.setString(2, request.getParameter("grade"));
 	pstmt.setString(3, request.getParameter("professor"));	
 	pstmt.setInt(4, Integer.parseInt(request.getParameter("student_id")));

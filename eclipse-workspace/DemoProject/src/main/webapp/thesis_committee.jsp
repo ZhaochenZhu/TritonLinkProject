@@ -85,7 +85,7 @@ if (action != null && action.equals("delete")) {
 	// DELETE the general_unit_requirement FROM the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
 	"DELETE FROM thesis_committee WHERE student_id = ? AND faculty_name = ?");
-	pstmt.setInt(1, request.getParameter("student_id"));
+	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
 	pstmt.setString(2, request.getParameter("faculty_name"));
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
