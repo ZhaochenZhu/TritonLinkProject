@@ -52,21 +52,6 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(true);
 	conn.close();
 }
-/**
-if (action != null && action.equals("insert_pre_req")) {
-	Connection conn = ConnectionProvider.getCon();
-	conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Course table.
-	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO prerequisite  VALUES (?, ?)"));
-	pstmt.setString(1, request.getParameter("course_number"));
-	pstmt.setString(2, request.getParameter("prereq_number"));
-	pstmt.executeUpdate();
-	conn.commit();
-	conn.setAutoCommit(true);
-	conn.close();
-}
 
 if (action != null && action.equals("update")) {
 	try{
@@ -75,11 +60,14 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Course table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE course_info SET course_name = ?, department = ?, lab_requirement = ? WHERE course_number = ?");	
-	pstmt.setString(4, request.getParameter("course_number"));
-	pstmt.setString(1, request.getParameter("course_name"));
-	pstmt.setString(2, request.getParameter("department"));	
-	pstmt.setString(3, request.getParameter("lab_requirement"));
+	"UPDATE courses_taken SET unit = ?, grade = ?, professor = ? WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");	
+	pstmt.setInt(1, Integer.parseInt(request.getParameter("unit")));
+	pstmt.setString(2, request.getParameter("grade"));
+	pstmt.setString(3, request.getParameter("professor"));
+	pstmt.setInt(4, Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setString(5, request.getParameter("course_number"));
+	pstmt.setString(6, request.getParameter("section_id"));	
+	pstmt.setInt(7, Integer.parseInt(request.getParameter("year")));
 	
 	// out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
@@ -91,19 +79,23 @@ if (action != null && action.equals("update")) {
 		System.out.println(ex);
 	}
 }
+
 if (action != null && action.equals("delete")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// DELETE the student FROM the Course table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"DELETE FROM course_info WHERE course_number = ?");
-	pstmt.setString(1,request.getParameter("course_number"));
+	"DELETE FROM courses_taken WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");
+	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setString(2, request.getParameter("course_number"));
+	pstmt.setString(3, request.getParameter("section_id"));	
+	pstmt.setInt(4, Integer.parseInt(request.getParameter("year")));
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
-}**/
+}
 %><br><br>
 
 <H1>Courses Taken</H1>
@@ -119,9 +111,9 @@ if (action != null && action.equals("delete")) {
       <TH>section_id</TH>
       <th>year</th>
       <TH>quarter</TH>
-      <TH>unit</TH>
-      <TH>professor</TH>
+      <TH>unit</TH>      
       <TH>grade</TH>
+      <TH>professor</TH>
       </TR>
       <% while(resultset.next()){ 
     	  PreparedStatement pst = connection.prepareStatement(
@@ -141,14 +133,17 @@ if (action != null && action.equals("delete")) {
       <TD><input value="<%= resultset.getString(3) %>" name="section_id"></TD>
       <TD><input value="<%= resultset.getInt(4) %>" name="year"></TD>
       <TD><input value="<%= quarter %>" name="quarter"></TD>
-      <TD><input value="<%= resultset.getInt(5) %>" name="unit"></TD>
-      <td><input value="<%= resultset.getString(6) %>" name="professor"></td>      
-      <TD><input value="<%= resultset.getString(7) %>" name="grade"></TD>
+      <TD><input value="<%= resultset.getInt(5) %>" name="unit"></TD>      
+      <TD><input value="<%= resultset.getString(6) %>" name="grade"></TD>
+      <td><input value="<%= resultset.getString(7) %>" name="professor"></td>
       <td><input type="submit" value="Update"></td>
       </form>
-       <form action="course.jsp" method="get">
+       <form action="course_taken.jsp" method="get">
 		<input type="hidden" value="delete" name="action">
-		<input type="hidden" value="<%= resultset.getString(1) %>" name="course_number">
+		<input type="hidden" value="<%= resultset.getInt(1) %>" name="student_id">
+	  <input type="hidden" value="<%= resultset.getString(2) %>" name="course_number">     
+      <input type="hidden" value="<%= resultset.getString(3) %>" name="section_id">
+      <input type="hidden" value="<%= resultset.getInt(4) %>" name="year">
 		<td><input type="submit" value="Delete"></td>
 		</form>
       </TR>
