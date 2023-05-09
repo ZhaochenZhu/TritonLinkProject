@@ -109,7 +109,7 @@ if (action != null && action.equals("delete")) {
       <input type="hidden" value="update" name="action">
       <TD><input value="<%= resultset.getInt(1) %>" name="student_id"> </TD>
       <td><input value="<%= resultset.getString(2) %>" name="faculty_name"></td>      
-      <td><input type="hidden" value="Update"></td>
+      <input type="hidden" value="Update">
       </form>
        <form action="thesis_committee.jsp" method="get">
 		<input type="hidden" value="delete" name="action">

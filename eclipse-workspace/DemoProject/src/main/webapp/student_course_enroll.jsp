@@ -127,6 +127,29 @@ if (action != null && action.equals("drop_course")) {
 	}
 }
 
+if (action != null && action.equals("change_grading")) {
+	search = true;
+	try{
+	Connection conn = ConnectionProvider.getCon();
+	conn.setAutoCommit(false);
+	//conn.setAutoCommit(false);
+	// Create the prepared statement and use it to
+	// INSERT the student attrs INTO the Student table.
+	pstmt = conn.prepareStatement(
+	("UPDATE enrollment_list_of_class SET grading_option = ? WHERE year = ? AND section_id = ? AND course_number = ? AND student_id = ?"));
+	pstmt.setString(1,request.getParameter("grading_option"));
+	pstmt.setInt(2,Integer.parseInt(request.getParameter("year")));
+	pstmt.setString(3,request.getParameter("section_id"));
+	pstmt.setString(4,request.getParameter("course_number"));
+	pstmt.setInt(5,Integer.parseInt(request.getParameter("student_id")));
+	int rowCount = pstmt.executeUpdate();
+	conn.commit();
+	conn.setAutoCommit(true);
+	}catch(Exception ex){
+		out.println(ex);
+	}
+}
+
 if (action != null && action.equals("enroll_class")) {
 	try{
 	Connection conn = ConnectionProvider.getCon();
@@ -209,13 +232,12 @@ if (action != null && action.equals("enroll_class")) {
      <h2>Enrolled course of <%= (request.getParameter("student_id")==null)? "student (Type in student_id to show)":request.getParameter("student_id")%></h2>
 	<TABLE BORDER="1">
 	<%
-	  
       Connection conn = ConnectionProvider.getCon();
       pstmt = conn.prepareStatement(
     			("SELECT * FROM enrollment_list_of_class WHERE student_id = ?"));
       ResultSet enrolled_course;
-      if(search){
-    	  pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
+      if(search && !request.getParameter("student_id").equals("")){
+    	  pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));    	  
     	  enrolled_course = pstmt.executeQuery();
       }else{
     	  enrolled_course = null;
@@ -231,13 +253,21 @@ if (action != null && action.equals("enroll_class")) {
       while(enrolled_course.next()){ %>
       <TR>
       <form action="student_course_enroll.jsp" method="get">
-      <input type="hidden" value="drop_course" name="action">
-      <td><input value="<%= enrolled_course.getString(3) %>" name="course_number"></td>
-	  <td><input value="<%= enrolled_course.getString(2) %>" name="section_id"></td>      
+      <input type="hidden" value="change_grading" name="action">
+      <td><input value="<%= enrolled_course.getString(3) %>" name="course_number" readonly></td>
+	  <td><input value="<%= enrolled_course.getString(2) %>" name="section_id" readonly></td>      
       <TD><input value="<%= enrolled_course.getString(5) %>" name="grading_option"></TD>
       <input type="hidden" value="<%= enrolled_course.getInt(1) %>" name="year">
       <input type="hidden" value="<%= enrolled_course.getInt(4) %>" name="student_id">
-		<td><input type="submit" value="Drop"></td>
+		<td><input type="submit" value="Update"></td>
+      <form action="student_course_enroll.jsp" method="get">
+      <input type="hidden" value="drop_course" name="action">
+      <input type="hidden" value="<%= enrolled_course.getString(3) %>" name="course_number">
+	  <input type="hidden" value="<%= enrolled_course.getString(2) %>" name="section_id">      
+      <input type="hidden" value="<%= enrolled_course.getString(5) %>" name="grading_option">
+      <input type="hidden" value="<%= enrolled_course.getInt(1) %>" name="year">
+      <input type="hidden" value="<%= enrolled_course.getInt(4) %>" name="student_id">
+		<td><input type="submit" value="Drop"></td>		
       </TR>
       <% }
       }%>
