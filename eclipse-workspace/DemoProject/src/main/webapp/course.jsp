@@ -24,7 +24,13 @@ table {
 Course number: <input type="text" name="course_number" size="5"/>
 Course name: <input type="text" name="course_name" size="5"/>
 Department: <input type="text" name="department" size="5"/>
-Lab requirement: <input type="text" name="lab_requirement" size="2"/>
+Lab requirement: 
+<%--<input type="text" name="lab_requirement" size="2"/> --%>
+<select name="lab_requirement" id="lab_requirement">
+  <option value="">Select One</option>
+  <option value="Yes">Yes</option>
+  <option value="No">No</option>
+</select>
 <input type="submit" value="Insert"/>
 </form>
 

@@ -26,9 +26,29 @@ First name: <input type="text" name="first_name" size="5"/>
 Last name: <input type="text" name="last_name" size="5"/>
 Middle name: <input type="text" name="middle_name" size="2"/>
 SSN: <input type="text" name="ssn" size="5"/>
-Enrolled: <input type="text" name="enrolled" size="2"/>
-Residential_status: <input type="text" name="residential_status" size="5"/>
-Current Degree: <input type="text" name="current_degree" size="5"/>
+<%--Enrolled: <input type="text" name="enrolled" size="2"/>--%>
+Enrolled:
+<select name="enrolled" id="enrolled">
+  <option value="">Select One</option>
+  <option value="Yes">Yes</option>
+  <option value="No">No</option>
+</select>
+<%--Residential_status: <input type="text" name="residential_status" size="5"/>--%>
+Residential_status:
+<select name="residential_status" id="residential_status">
+  <option value="">Select One</option>
+  <option value="California resident">California resident</option>
+  <option value="foreign student">foreign student</option>
+  <option value="non-CA US student">non-CA US student</option>
+</select>
+<%-- Current Degree: <input type="text" name="current_degree" size="5"/>--%>
+Current Degree:
+<select name="current_degree" id="current_degree">
+  <option value="">Select One</option>
+  <option value="Undergraduate">Undergraduate</option>
+  <option value="Master">Master</option>
+  <option value="PhD">PhD</option>
+</select>
 <input type="submit" value="Insert"/>
 </form>
 
@@ -44,7 +64,13 @@ Department: <input type="text" name="department" size="5"/>
 <form name = "f3" method="get">
 <input type="hidden" value="insert_Phd" name="action">
 Student ID: <input type="text" name="student_id" size="5"/>
-Candidacy: <input type="text" name="candidacy" size="5"/>
+<%--<input type="text" name="candidacy" size="5"/> --%>
+Candidacy: 
+<select name="candidacy" id="candidacy">
+  <option value="">Select One</option>
+  <option value="Yes">Yes</option>
+  <option value="No">No</option>
+</select>
 <input type="submit" value="Insert"/>
 </form>
 <%
@@ -241,7 +267,7 @@ if (action != null && action.equals("delete_phd")) {
       <TR>
       <form action="student.jsp" method="get">
       <input type="hidden" value="update" name="action">
-      <td><input value="<%= resultset.getInt(1) %>" name="student_id"></td>
+      <td><input value="<%= resultset.getInt(1) %>" name="student_id" readonly></td>
 	  <td><input value="<%= resultset.getString(2) %>" name="first_name"></td>      
       <TD><input value="<%= resultset.getString(3) %>" name="last_name"></TD>
       <TD><input value="<%= resultset.getString(4) %>" name="middle_name"></TD>
@@ -278,7 +304,7 @@ if (action != null && action.equals("delete_phd")) {
       <TR>
       <form action="student.jsp" method="get">
       <input type="hidden" value="update_master" name="action">
-      <td><input value="<%= resultset.getInt(1) %>" name="student_id"></td>
+      <td><input value="<%= resultset.getInt(1) %>" name="student_id" readonly></td>
 	  <td><input value="<%= resultset.getString(2) %>" name="department"></td>      
       <td><input type="submit" value="Update"></td>
       </form>
@@ -308,7 +334,7 @@ if (action != null && action.equals("delete_phd")) {
       <TR>
       <form action="student.jsp" method="get">
       <input type="hidden" value="update_phd" name="action">
-      <td><input value="<%= resultset.getInt(1) %>" name="student_id"></td>
+      <td><input value="<%= resultset.getInt(1) %>" name="student_id" readonly></td>
 	  <td><input value="<%= resultset.getString(2) %>" name="candidacy"></td>      
       <td><input type="submit" value="Update"></td>
       </form>

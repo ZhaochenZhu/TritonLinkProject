@@ -22,7 +22,15 @@ table {
 <form name = "f1" method="get">
 <input type="hidden" value="insert" name="action">
 faculty name: <input type="text" name="faculty_name" size="20"/>
-title: <input type="text" name="title" size="20"/>
+<%--<input type="text" name="title" size="20"/> --%>
+title: 
+<select name="title" id="title">
+  <option value="">Select One</option>
+  <option value="Lecturer">Lecturer</option>
+  <option value="Assistant Professor">Assistant Professor</option>
+  <option value="Associate Professor">Associate Professor</option>
+  <option value="Professor">Professor</option>
+</select>
 <input type="submit" value="Insert"/>
 </form>
 

@@ -58,6 +58,7 @@ Course number: <input type="text" name="course_number"/>
       <th>Units</th>
       <TH>Start Date</TH>
       <TH>End Date</TH>
+      <TH>Grading Option</TH>
       </TR>
       <% if(section!=null){
     	  boolean found = false;
@@ -66,12 +67,13 @@ Course number: <input type="text" name="course_number"/>
       <TR>
       <form action="student_course_enroll.jsp" method="get">
       <input type="hidden" value="update" name="action">
-      <td><%= section.getString(3) %></td>
-	  <td><%= section.getString(2) %></td>      
-      <TD><%= section.getString(8) %></TD>
-      <TD><%= section.getInt(5) %></TD>
-      <TD><%= section.getString(6) %> </TD>
-      <TD><%= section.getString(7) %></TD>
+      <td><input type="text" value="<%= section.getString(3) %>" name="course_number" readonly></td>
+	  <td><input type="text" value="<%= section.getString(2) %>" name="section_id" readonly></td> 
+	  <td><input type="text" value="<%= section.getString(8) %>" name="professor" readonly></td>	  
+      <TD><input type="text" value="<%= section.getInt(5) %>" name="units" readonly></TD>
+      <TD><input type="date" value="<%= section.getString(6) %>" name="start_date" readonly></TD>
+      <TD><input type="date" value="<%= section.getString(7) %>" name="end_date" readonly></TD>
+      <TD><input type="text" value="<%= section.getString(9) %>" name="grading_option" readonly></TD>      
       </form>
       <form action="student_course_enroll.jsp" method="get">
 		<input type="hidden" value="enroll_class" name="action">
@@ -80,6 +82,11 @@ Course number: <input type="text" name="course_number"/>
 		<input type="hidden" value="<%= section.getString(3) %>" name="course_number">
 		<input type="hidden" value="<%= section.getInt(5) %>" name="units">
 		<input type="hidden" value="<%= request.getParameter("student_id") %>" name="student_id">
+		<TD><select name="grading_option" id="grading_option">
+		  <option value="">Select One</option>
+		  <option value="letter_grade">Letter Grade</option>
+		  <option value="s_u">S/U</option>
+		</select></TD>
 		<td><input type="submit" value="Enroll"></td>
 		</form>
       </TR>
@@ -135,15 +142,29 @@ if (action != null && action.equals("change_grading")) {
 	//conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
+	
+	pstmt = conn.prepareStatement("SELECT grading_option FROM section WHERE year = ? AND section_id = ? AND course_number = ?");
+	pstmt.setInt(1,2023);
+	pstmt.setString(2,request.getParameter("section_id"));
+	pstmt.setString(3,request.getParameter("course_number"));
+	ResultSet resultset = pstmt.executeQuery();
+	boolean has_grading_option = false;
+	if(resultset.next() && (resultset.getString(1).equals(request.getParameter("grading_option")))||resultset.getString(1).equals("both")){
+		has_grading_option = true;
+	}
+	if(has_grading_option){
 	pstmt = conn.prepareStatement(
-	("UPDATE enrollment_list_of_class SET grading_option = ? WHERE year = ? AND section_id = ? AND course_number = ? AND student_id = ?"));
+	("UPDATE enrollment_list_of_class SET grading_option = ?, unit = ? WHERE year = ? AND section_id = ? AND course_number = ? AND student_id = ?"));
 	pstmt.setString(1,request.getParameter("grading_option"));
-	pstmt.setInt(2,Integer.parseInt(request.getParameter("year")));
-	pstmt.setString(3,request.getParameter("section_id"));
-	pstmt.setString(4,request.getParameter("course_number"));
-	pstmt.setInt(5,Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setInt(2,Integer.parseInt(request.getParameter("unit")));
+	pstmt.setInt(3,Integer.parseInt(request.getParameter("year")));
+	pstmt.setString(4,request.getParameter("section_id"));
+	pstmt.setString(5,request.getParameter("course_number"));
+	pstmt.setInt(6,Integer.parseInt(request.getParameter("student_id")));
+	//out.println(pstmt.toString());
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
+	}
 	conn.setAutoCommit(true);
 	}catch(Exception ex){
 		out.println(ex);
@@ -179,15 +200,26 @@ if (action != null && action.equals("enroll_class")) {
 			}
 		}
 	}
-	if(pre_reqs.isEmpty()){
+	
+	pstmt = conn.prepareStatement("SELECT grading_option FROM section WHERE year = ? AND section_id = ? AND course_number = ?");
+	pstmt.setInt(1,2023);
+	pstmt.setString(2,request.getParameter("section_id"));
+	pstmt.setString(3,request.getParameter("course_number"));
+	resultset = pstmt.executeQuery();
+	boolean has_grading_option = false;
+	if(resultset.next() && (resultset.getString(1).equals(request.getParameter("grading_option"))||resultset.getString(1).equals("both"))){
+		has_grading_option = true;
+	}
+	if(pre_reqs.isEmpty() && has_grading_option){
 		// can enroll in course
 		pstmt = conn.prepareStatement(
-		("INSERT INTO enrollment_list_of_class VALUES (?, ?, ?, ?, ?)"));
+		("INSERT INTO enrollment_list_of_class VALUES (?, ?, ?, ?, ?, ?)"));
 		pstmt.setInt(1,2023);
 		pstmt.setString(2,request.getParameter("section_id"));
 		pstmt.setString(3,request.getParameter("course_number"));
 		pstmt.setInt(4,Integer.parseInt(request.getParameter("student_id")));
-		pstmt.setString(5,request.getParameter("units"));
+		pstmt.setString(5,request.getParameter("grading_option"));
+		pstmt.setInt(6,Integer.parseInt(request.getParameter("units")));
 		pstmt.executeUpdate();
 		conn.commit();
 		out.println("Enrolled");
@@ -197,7 +229,7 @@ if (action != null && action.equals("enroll_class")) {
 	}
 	conn.setAutoCommit(true);
 	}catch(Exception ex){
-		out.println(ex.getClass().getSimpleName());
+		out.println(ex);
 	}
 }
 
@@ -248,6 +280,7 @@ if (action != null && action.equals("enroll_class")) {
       <TH>Course</TH>
       <TH>Section ID</TH>
       <th>Grading_option</th>
+      <TH>Unit</TH>
       </TR>
       <% if(enrolled_course!=null){
       while(enrolled_course.next()){ %>
@@ -257,14 +290,17 @@ if (action != null && action.equals("enroll_class")) {
       <td><input value="<%= enrolled_course.getString(3) %>" name="course_number" readonly></td>
 	  <td><input value="<%= enrolled_course.getString(2) %>" name="section_id" readonly></td>      
       <TD><input value="<%= enrolled_course.getString(5) %>" name="grading_option"></TD>
+      <TD><input value="<%= enrolled_course.getInt(6) %>" name="unit"></TD>
       <input type="hidden" value="<%= enrolled_course.getInt(1) %>" name="year">
       <input type="hidden" value="<%= enrolled_course.getInt(4) %>" name="student_id">
 		<td><input type="submit" value="Update"></td>
+      </form>
       <form action="student_course_enroll.jsp" method="get">
       <input type="hidden" value="drop_course" name="action">
       <input type="hidden" value="<%= enrolled_course.getString(3) %>" name="course_number">
 	  <input type="hidden" value="<%= enrolled_course.getString(2) %>" name="section_id">      
       <input type="hidden" value="<%= enrolled_course.getString(5) %>" name="grading_option">
+      <input type="hidden" value="<%= enrolled_course.getInt(6) %>" name="unit">
       <input type="hidden" value="<%= enrolled_course.getInt(1) %>" name="year">
       <input type="hidden" value="<%= enrolled_course.getInt(4) %>" name="student_id">
 		<td><input type="submit" value="Drop"></td>		
