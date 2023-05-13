@@ -1,6 +1,0 @@
-INDEX VERSION 1.132+C:\Users\qq227\eclipse-workspace\TritionLinkProject\.metadata\.plugins\org.eclipse.jdt.core
-1099699884.index
-3397293651.index
-646681647.index
-1865797976.index
-1509799344.index
