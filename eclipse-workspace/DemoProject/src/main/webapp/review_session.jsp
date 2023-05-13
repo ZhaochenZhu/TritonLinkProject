@@ -25,9 +25,9 @@ year: <input type="text" name="year" size="20"/>
 section id: <input type="text" name="section_id" size="20"/>
 course number: <input type="text" name="course_number" size="20"/>
 day: <input type="text" name="day" size="20"/>
-date: <input type="text" name="date" size="20"/>
-start time: <input type="text" name="start_time" size="20"/>
-end time: <input type="text" name="end_time" size="20"/>
+date: <input type="date" name="date"/>
+start time: <input type="time" name="start_time" size="20"/>
+end time: <input type="time" name="end_time" size="20"/>
 <input type="submit" value="Insert"/>
 </form>
 
@@ -121,9 +121,9 @@ if (action != null && action.equals("delete")) {
   <td><input value="<%= resultset.getString(2) %>" name="section_id"></td>
   <input type="hidden" value="<%= resultset.getString(4) %>" name="type">
   <td><input value="<%= resultset.getString(5) %>" name="day"></td>
-  <td><input value="<%= resultset.getString(6) %>" name="date"></td>
-  <td><input value="<%= resultset.getString(7) %>" name="start_time"></td>
-  <td><input value="<%= resultset.getString(8) %>" name="end_time"></td>
+  <td><input value="<%= resultset.getString(6) %>" type = "date" name="date"></td>
+  <td><input value="<%= resultset.getString(7) %>" type = "time" name="start_time"></td>
+  <td><input value="<%= resultset.getString(8) %>" type = "time" name="end_time"></td>
   <td><input type="submit" value="Update"></td>
   </form>
   <form action="review_session.jsp" method="get">
