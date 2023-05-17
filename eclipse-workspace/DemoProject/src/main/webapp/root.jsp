@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Navigation</title>
 </head>
 <body>
 <TABLE>
@@ -18,7 +18,9 @@
 	  <tr><td><a href="review_session.jsp">review_session</a></td></tr>
       <tr><td><a href="student_probation.jsp">student probation</a></td></tr> 
       <tr><td><a href="thesis_committee.jsp">thesis committee</a></td></tr>  
-      <tr><td><a href="course_taken.jsp">courses taken</a></td></tr>  
+      <tr><td><a href="course_taken.jsp">courses taken</a></td></tr>
+      <tr><td><a href="checkStudentEnrolledCourse.jsp">check enrolled course</a></td></tr>
+      
       
 </TABLE>
 </body>
