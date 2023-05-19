@@ -8,7 +8,7 @@ public class ConnectionProvider implements Provider {
 	public static Connection getCon() {
 		try {
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(connURL,username,pwd);
+			con = DriverManager.getConnection(connURL,username,"");
 		}catch(Exception ex) {
 			System.out.println(ex);
 		}
