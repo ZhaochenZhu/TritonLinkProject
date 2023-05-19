@@ -25,6 +25,11 @@ Student ID: <input type="text" name="student_id" size="5"/>
 Course number: <input type="text" name="course_number" size="5"/>
 Section ID: <input type="text" name="section_id" size="5"/>
 Year: <input type="text" name="year" size="5"/>
+Grading option: 
+<select name="grading_option" id="grading_option">
+  <option value="letter_grade">Letter Grade</option>
+  <option value="s_u">S/U</option>
+</select>
 Unit: <input type="text" name="unit" size="5"/>
 Grade: <input type="text" name="grade" size="5"/>
 Professor: <input type="text" name="professor" size="5"/>
@@ -39,7 +44,7 @@ if (action != null && action.equals("insert")) {
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Course table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO courses_taken VALUES (?, ?, ?, ?, ?, ?, ?)"));
+	("INSERT INTO courses_taken VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
 	pstmt.setString(2, request.getParameter("course_number"));
 	pstmt.setString(3, request.getParameter("section_id"));
@@ -47,6 +52,7 @@ if (action != null && action.equals("insert")) {
 	pstmt.setInt(5, Integer.parseInt(request.getParameter("unit")));
 	pstmt.setString(6, request.getParameter("grade"));
 	pstmt.setString(7, request.getParameter("professor"));
+	pstmt.setString(8, request.getParameter("grading_option"));
 	pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
@@ -54,20 +60,21 @@ if (action != null && action.equals("insert")) {
 }
 
 if (action != null && action.equals("update")) {
-	try{
+	//try{
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Course table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE courses_taken SET unit = ?, grade = ?, professor = ? WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");	
+	"UPDATE courses_taken SET unit = ?, grading_option = ?, grade = ?, professor = ? WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");	
 	pstmt.setInt(1, Integer.parseInt(request.getParameter("unit")));
-	pstmt.setString(2, request.getParameter("grade"));
-	pstmt.setString(3, request.getParameter("professor"));
-	pstmt.setInt(4, Integer.parseInt(request.getParameter("student_id")));
-	pstmt.setString(5, request.getParameter("course_number"));
-	pstmt.setString(6, request.getParameter("section_id"));	
-	pstmt.setInt(7, Integer.parseInt(request.getParameter("year")));
+	pstmt.setString(2, request.getParameter("grading_option"));
+	pstmt.setString(3, request.getParameter("grade"));
+	pstmt.setString(4, request.getParameter("professor"));
+	pstmt.setInt(5, Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setString(6, request.getParameter("course_number"));
+	pstmt.setString(7, request.getParameter("section_id"));	
+	pstmt.setInt(8, Integer.parseInt(request.getParameter("year")));
 	
 	// out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
@@ -75,9 +82,9 @@ if (action != null && action.equals("update")) {
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
-	}catch(Exception ex){
-		System.out.println(ex);
-	}
+	//}catch(Exception ex){
+		//System.out.println(ex);
+	//}
 }
 
 if (action != null && action.equals("delete")) {
@@ -111,6 +118,7 @@ if (action != null && action.equals("delete")) {
       <TH>section_id</TH>
       <th>year</th>
       <TH>quarter</TH>
+      <TH>grading_option</TH>
       <TH>unit</TH>      
       <TH>grade</TH>
       <TH>professor</TH>
@@ -133,6 +141,7 @@ if (action != null && action.equals("delete")) {
       <TD><input value="<%= resultset.getString(3) %>" name="section_id"></TD>
       <TD><input value="<%= resultset.getInt(4) %>" name="year"></TD>
       <TD><input value="<%= quarter %>" name="quarter"></TD>
+      <TD><input value="<%= resultset.getString(8) %>" name="grading_option"></TD>
       <TD><input value="<%= resultset.getInt(5) %>" name="unit"></TD>      
       <TD><input value="<%= resultset.getString(6) %>" name="grade"></TD>
       <td><input value="<%= resultset.getString(7) %>" name="professor"></td>

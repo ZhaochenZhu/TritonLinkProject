@@ -3,14 +3,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+<Style>
+table, th, td{
+
+border-collapse: collapse;
+
+
+}
+</Style>
 <meta charset="UTF-8">
 <title>Navigation</title>
 </head>
 <body>
-<TABLE>
+<font size="5">
+<TABLE align="left">
+<TH>Data Entry </TH>
+<TH>Query Forms </TH>
+      <tr>
+      <td><a href="student.jsp">student</a></td>
+      <td><a href="checkStudentEnrolledCourse.jsp">check enrolled course</a></td>
+      </tr>
       
-      <tr><td><a href="student.jsp">student</a></td></tr>
-      <tr><td><a href="faculty.jsp">faculty</a></td></tr>
+      <tr>
+      <td><a href="faculty.jsp">faculty</a></td>
+      <td><a href="class_roster.jsp">check class roster</a></td>
+      </tr>
 	  <tr><td><a href="course.jsp">course</a></td></tr>
       <tr><td><a href="class.jsp">class</a></td></tr>
 	  <tr><td><a href="degrees.jsp">degrees</a></td></tr>
@@ -19,7 +36,6 @@
       <tr><td><a href="student_probation.jsp">student probation</a></td></tr> 
       <tr><td><a href="thesis_committee.jsp">thesis committee</a></td></tr>  
       <tr><td><a href="course_taken.jsp">courses taken</a></td></tr>
-      <tr><td><a href="checkStudentEnrolledCourse.jsp">check enrolled course</a></td></tr>
       
       
 </TABLE>
