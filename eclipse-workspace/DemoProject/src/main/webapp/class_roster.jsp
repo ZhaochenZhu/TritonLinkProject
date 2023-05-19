@@ -76,7 +76,7 @@ if (action != null && action.equals("select_class")) {
 			roster_course = pstmt.executeQuery();
 		}else{		
 			PreparedStatement pstmt = connection.prepareStatement(
-					"select s.student_id, s.first_name, s.last_name, c.course_number, e.section_id, c.grading_option, c.unit "
+					"select s.student_id, s.first_name, s.last_name, c.course_number, c.section_id, c.grading_option, c.unit "
 						+"from courses_taken c, student s, course_info i "
 						+"Where c.student_id = s.student_id "
 						+"AND c.course_number = i.course_number "

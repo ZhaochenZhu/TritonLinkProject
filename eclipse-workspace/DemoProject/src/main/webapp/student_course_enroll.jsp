@@ -44,7 +44,7 @@ Course number: <input type="text" name="course_number"/>
 <%
 	Connection connection = ConnectionProvider.getCon();
 	PreparedStatement pstmt = connection.prepareStatement(
-		"SELECT * From section WHERE course_number = ? AND year = 2023 AND quarter ='SP'");
+		"SELECT * From section WHERE course_number = ? AND year = 2023 AND quarter ='Spring'");
 	pstmt.setString(1, request.getParameter("course_number"));
 	ResultSet section = pstmt.executeQuery();
 	boolean search = false;
