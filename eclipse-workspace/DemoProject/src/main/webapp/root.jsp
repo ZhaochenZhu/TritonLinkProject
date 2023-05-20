@@ -34,7 +34,10 @@ text-align: center
 	  <td><a href="student_grade_report.jsp">grade report</a></td>
 	  </tr>
 	  
-      <tr><td><a href="class.jsp">class</a></td></tr>
+      <tr>
+      <td><a href="class.jsp">class</a></td>
+      <td><a href="course_evaluation.jsp">course evaluation</a></td>
+      </tr>
 	  <tr><td><a href="degrees.jsp">degrees</a></td></tr>
 	  <tr><td><a href="student_course_enroll.jsp">Webreg</a></td></tr>
 	  <tr><td><a href="review_session.jsp">review_session</a></td></tr>

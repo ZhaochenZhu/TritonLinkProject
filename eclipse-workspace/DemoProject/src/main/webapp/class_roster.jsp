@@ -63,6 +63,8 @@ if (action != null && action.equals("select_class")) {
 		if(resultset.next()){
 			cur_course = " of "+resultset.getString(1)+", "+ request.getParameter("course_name")
 			+" in quarter "+request.getParameter("quarter")+" "+request.getParameter("year");
+		}else{
+			out.println("Please enter valid course name");
 		}
 		
 		
