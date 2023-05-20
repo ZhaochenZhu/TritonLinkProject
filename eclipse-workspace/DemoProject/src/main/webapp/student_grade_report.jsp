@@ -46,6 +46,7 @@ ResultSet resultset = statement.executeQuery("select * from student") ;
   
 <%
 String cur_student = "";
+String grade_details = "";
 if(request.getParameter("student")==null || request.getParameter("student").equals("")){
 	cur_student = "";
 }else{
@@ -64,10 +65,10 @@ if (action != null && action.equals("select_student")) {
 		resultset = statement.executeQuery("select first_name, middle_name, last_name, g.total_gpa from student s, student_grade g WHERE s.student_id = "
 			+Integer.parseInt(request.getParameter("student"))+" AND s.student_id = g.student_id") ;
 		resultset.next();
-		//out.println(resultset.getString(1)+","+resultset.getString(2)+","+resultset.getString(3)+", GPA: "+resultset.getFloat(4));	
+		grade_details = resultset.getString(1)+","+resultset.getString(2)+","+resultset.getString(3)+", GPA: "+resultset.getFloat(4);	
 		
 		PreparedStatement pst = connection.prepareStatement(
-				"select c.quarter, t.year from courses_taken t, section c "
+				"select distinct c.quarter, t.year from courses_taken t, section c "
 				+"where student_id = ? "
 				+"AND t.year = c.year "
 				+"AND t.section_id = c.section_id "
@@ -81,6 +82,7 @@ if (action != null && action.equals("select_student")) {
 <h2><%= "Grade Report"+cur_student%></h2>
 
 <% 
+out.println(grade_details);
 if(quarters!=null){
 while(quarters.next()){ 
 	String current_quarter = quarters.getString(1);
