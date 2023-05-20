@@ -64,8 +64,11 @@ if (action != null && action.equals("select_student")) {
 	}else{
 		resultset = statement.executeQuery("select first_name, middle_name, last_name, g.total_gpa from student s, student_grade g WHERE s.student_id = "
 			+Integer.parseInt(request.getParameter("student"))+" AND s.student_id = g.student_id") ;
-		resultset.next();
-		grade_details = resultset.getString(1)+","+resultset.getString(2)+","+resultset.getString(3)+", GPA: "+resultset.getFloat(4);	
+		if(resultset.next()){
+			grade_details = resultset.getString(1)+","+resultset.getString(2)
+			+","+resultset.getString(3)+", GPA: "+resultset.getFloat(4);	
+		}	
+		
 		
 		PreparedStatement pst = connection.prepareStatement(
 				"select distinct c.quarter, t.year from courses_taken t, section c "
