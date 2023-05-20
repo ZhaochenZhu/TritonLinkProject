@@ -170,7 +170,7 @@ if (action != null && action.equals("professor_grade_distribution")) {
 		avg_gpa.next();
 		
 		professor_grade_summary = request.getParameter("course_number")+" by professor: "
-		+request.getParameter("professor")+", Average Grade Received: "+avg_gpa.getFloat(1);
+		+request.getParameter("professor")+", average grade received: "+avg_gpa.getFloat(1);
 				
 		PreparedStatement pstmt = connection.prepareStatement("With student_course As( "
 				+"select * "
