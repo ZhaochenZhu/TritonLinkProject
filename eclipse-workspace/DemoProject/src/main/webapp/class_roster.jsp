@@ -24,7 +24,7 @@ margin: auto;
  </TR>
 </TABLE>
 
-<h2>Enter Student</h1>
+<h2>Enter class info</h1>
 <%
 Connection connection = ConnectionProvider.getCon();
 Statement statement = connection.createStatement() ;
@@ -60,8 +60,11 @@ if (action != null && action.equals("select_class")) {
 				+"from course_info "
 				+"Where course_name = '"
 			+request.getParameter("course_name") + "'");
-		resultset.next();
-		cur_course = " of "+resultset.getString(1)+", "+ request.getParameter("course_name")+" in quarter "+request.getParameter("quarter")+" "+request.getParameter("year");
+		if(resultset.next()){
+			cur_course = " of "+resultset.getString(1)+", "+ request.getParameter("course_name")
+			+" in quarter "+request.getParameter("quarter")+" "+request.getParameter("year");
+		}
+		
 		
 		
 		if(request.getParameter("quarter").equals("Spring") && request.getParameter("year").equals("2023")){		
