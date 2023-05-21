@@ -25,7 +25,7 @@ margin: auto;
  </TR>
 </TABLE>
     
-<h2>Select Student and major</h2>
+<h2>Select an Undergraduate Student and a major</h2>
 <%
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
