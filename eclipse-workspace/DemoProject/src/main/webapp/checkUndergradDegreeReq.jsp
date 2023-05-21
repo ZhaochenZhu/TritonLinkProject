@@ -135,7 +135,12 @@ if (student_id != null && major != null) {
 	tpstmt.setInt(4, student_id);
 	tpstmt.setString(5, major);
 	tpstmt.setString(6, major);
-	total_unit = tpstmt.executeQuery();
+	try{	
+		total_unit = tpstmt.executeQuery();
+	}
+	catch(Exception e) {
+		out.println(tpstmt);
+	}
 	
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
@@ -157,9 +162,14 @@ if (student_id != null && major != null) {
 	pstmt.setString(2, major);
 	pstmt.setString(3, major);
 	pstmt.setString(4, major);
-	//out.println(pstmt.toString());
-	category_unit = pstmt.executeQuery();
-	//category_unit = null;
+	try{
+		category_unit = pstmt.executeQuery();
+	}
+	catch (Exception e) {
+		out.println("\n");
+		out.println(pstmt);
+	}
+	
 }
 
 %>
