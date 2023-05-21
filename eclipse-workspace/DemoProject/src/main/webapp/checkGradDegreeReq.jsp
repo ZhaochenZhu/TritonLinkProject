@@ -25,12 +25,13 @@ margin: auto;
  </TR>
 </TABLE>
     
+   
 <h2>Select a Graduate Student and a major</h2>
 <%
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
-ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Master' AND enrolled = 'Yes'") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from general_unit_requirement where type = 'Master'") ;
+ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Graduate' AND enrolled = 'Yes'") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Graduate'") ;
 
 %>
 
@@ -40,7 +41,6 @@ ResultSet degreeResultset = connection.createStatement().executeQuery("select * 
 <select name="student" id="student">
   <option value="">Select one from below</option>
 	<%while(resultset.next()){  %>
-  <%-- <option value="<%=resultset.getInt(1) %>"><%=resultset.getString(2)+ " "+ resultset.getString(3) %></option>--%>
   <option value="<%=resultset.getInt(1) %>"><%=resultset.getInt(1) %></option>
       <% } %>
 </select>
@@ -50,7 +50,6 @@ ResultSet degreeResultset = connection.createStatement().executeQuery("select * 
 <select name="major" id="major">
   <option value="">Select one from below</option>
 	<%while(degreeResultset.next()){  %>
-  <%-- <option value="<%=resultset.getInt(1) %>"><%=resultset.getString(2)+ " "+ resultset.getString(3) %></option>--%>
   <option value="<%=degreeResultset.getString(1) %>"><%=degreeResultset.getString(1) %></option>
       <% } %>
 </select>
@@ -64,8 +63,8 @@ ResultSet degreeResultset = connection.createStatement().executeQuery("select * 
 <%  
 String curr_major = null;
 String curr_student = null;
-ResultSet minimum_unit = null;
-ResultSet unmet_unit = null;
+ResultSet total_unit = null;
+ResultSet category_unit = null;
 
 %>
 
@@ -108,21 +107,46 @@ if (action_major != null && action_major.equals("select_major")) {
 
 <%
 if (student_id != null && major != null) {
+	PreparedStatement tpstmt = connection.prepareStatement(
+			"With met_unit AS (" + 
+			"(select SUM(t.unit) AS unit " +
+			"from courses_taken t " +
+			"where t.student_id = ? AND t.course_number IN(" +
+			"select course_number from general_course_requirement " +
+			"where type = 'Graduate' AND major = ?)) " +
+			"union " +
+			"(select 0 AS unit " +
+			"from student s " +
+			"where s.student_id = ? AND s.student_id NOT IN(" +
+			"select t.student_id " +
+			"from courses_taken t " +
+			"where t.student_id = ? AND t.course_number IN(" +
+			"select course_number from general_course_requirement " +
+			"where type = 'Graduate' AND major = ?))))" +
+			"select (u.total_unit - m.unit) AS unit " +
+			"from total_unit_requirement u, met_unit m " +
+			"where u.type = 'Graduate' AND u.major = ?");
+	tpstmt.setInt(1, student_id);
+	tpstmt.setString(2, major);
+	tpstmt.setInt(3, student_id);
+	tpstmt.setInt(4, student_id);
+	tpstmt.setString(5, major);
+	tpstmt.setString(6, major);
+	total_unit = tpstmt.executeQuery();
 	
-	minimum_unit = connection.createStatement().executeQuery("select * from general_unit_requirement where type ='Undergraduate' AND major = '" + major + "'");
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
 		"select c.category, SUM(t.unit) AS unit " + 
 		"from general_course_requirement c, courses_taken t " +
-		"where t.student_id = ? AND c.type = 'Undergraduate' AND c.major = ? AND c.course_number = t.course_number " +
+		"where t.student_id = ? AND c.type = 'Graduate' AND c.major = ? AND c.course_number = t.course_number " +
 		"group by c.category)" +
 		"(select u.category, (u.minimum_unit - m.unit) AS unit " +
 		"from general_unit_requirement u, met_unit m " +
-		"where u.type = 'Undergraduate' AND u.major = ? AND u.category = m.category)" +
+		"where u.type = 'Graduate' AND u.major = ? AND u.category = m.category)" +
 		"union " +
 		"(select u.category, u.minimum_unit " +
 		"from general_unit_requirement u " +
-		"where u.type = 'Undergraduate' AND u.major = ? AND u.category NOT IN (Select category from met_unit));"
+		"where u.type = 'Graduate' AND u.major = ? AND u.category NOT IN (Select category from met_unit));"
 		
 			
 	);
@@ -130,47 +154,41 @@ if (student_id != null && major != null) {
 	pstmt.setString(2, major);
 	pstmt.setString(3, major);
 	pstmt.setString(4, major);
-	unmet_unit = pstmt.executeQuery();
+	category_unit = pstmt.executeQuery();
 }
 
 %>
 
 <% 
-if (minimum_unit != null) {
-	%><h2><%= major + " unit requirements"  %></h2>
+if (total_unit != null && category_unit != null) {
+	%><h2><%= major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
 	<TABLE BORDER = "1">
 	<TR>
-	<TH>category</TH>
-	<TH>minimum_unit</TH>
+	<TH>remaining total_unit</TH>
 	</TR> <%
-	while(minimum_unit.next()) { %>
+	total_unit.next(); %>
 		 <TR>
-      <TD><%=minimum_unit.getString(3) %></TD>
-      <TD><%=minimum_unit.getInt(4) %></TD>
+      <TD><%=total_unit.getInt(1) %></TD>
       </TR>
-	<%}
-}
-if (unmet_unit != null) {
-	%><h2><%= "unmet unit requirement for " + student_name  %></h2>
-	<TABLE BORDER = "1">
-	<TR>
-	<TH>category</TH>
-	<TH>unmet unit</TH>
-	</TR> <%
-	while(unmet_unit.next()) { %>
-		 <TR>
-      <TD><%=unmet_unit.getString(1) %></TD>
-      <TD><%=unmet_unit.getInt(2) %></TD>
-      </TR>
-	<%}
-}
-%>
-</TABLE>
+	
+	</TABLE>
+<br><br>
 
-<% 
-/* resultset.close(); */
-/* connection.close(); */
-%>
+	<h2><%= "Remaining Category Unit Requirement for " + student_name + ", " + student_id %></h2>
+	<TABLE BORDER = "1">
+	<TR>
+	<TH>category</TH>
+	<TH>remaining unit</TH>
+	</TR> <%
+	while(category_unit.next()) { %>
+		 <TR>
+      <TD><%=category_unit.getString(1) %></TD>
+      <TD><%=category_unit.getInt(2) %></TD>
+      </TR>
+	<%}%>
+	</TABLE>
+<%}%>
+
     
 </body>
 </html>

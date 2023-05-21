@@ -46,7 +46,7 @@ Current Degree:
 <select name="current_degree" id="current_degree">
   <option value="">Select One</option>
   <option value="Undergraduate">Undergraduate</option>
-  <option value="Master">Master</option>
+  <option value="Graduate">Graduate</option>
   <option value="PhD">PhD</option>
 </select>
 <input type="submit" value="Insert"/>

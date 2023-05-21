@@ -42,9 +42,11 @@ text-align: center
 	  <tr>
 	  <td><a href="degrees.jsp">degrees</a></td>
 	  <td><a href="checkUndergradDegreeReq.jsp">Check undergraduate major requirement</a></td>
-      
 	  </tr>
-	  <tr><td><a href="student_course_enroll.jsp">Webreg</a></td></tr>
+	  <tr>
+	  <td><a href="student_course_enroll.jsp">Webreg</a></td>
+	  <td><a href="checkGradDegreeReq.jsp">Check Master major requirement</a></td>
+	  </tr>
 	  <tr><td><a href="review_session.jsp">review_session</a></td></tr>
       <tr><td><a href="student_probation.jsp">student probation</a></td></tr> 
       <tr><td><a href="thesis_committee.jsp">thesis committee</a></td></tr>  

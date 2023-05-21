@@ -30,7 +30,7 @@ margin: auto;
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
 ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Undergraduate' AND enrolled = 'Yes'") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from general_unit_requirement where type = 'Undergraduate'") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Undergraduate'") ;
 
 %>
 
@@ -109,23 +109,37 @@ if (action_major != null && action_major.equals("select_major")) {
 <%
 if (student_id != null && major != null) {
 	PreparedStatement tpstmt = connection.prepareStatement(
-			"With met_unit AS (" + 
-			"select SUM(t.unit) AS unit " +
+			"With met_total_unit AS (" +
+			"(select SUM(t.unit) AS unit " +
 			"from courses_taken t " +
-			"where t.student_id = ? AND t.course_number IN(" +
+			"where t.student_id = ? AND t.course_number IN( " +
 			"select course_number from general_course_requirement " +
-			"where type = 'Undergraduate' AND major = ?))" +
+			"where type = 'Undergraduate' AND major = ?)) " +
+			"union " +
+			"(select 0 AS unit " +
+			"from student s " +
+			"where s.student_id = ? AND s.student_id NOT IN( " +
+			"select t.student_id " +
+			"from courses_taken t " +
+			"where t.student_id = ? AND t.course_number IN( " +
+			"select course_number from general_course_requirement " +
+			"where type = 'Undergraduate' AND major = ?)))" +
+			")" +
 			"select (u.total_unit - m.unit) AS unit " +
-			"from total_unit_requirement u, met_unit m " +
-			"where u.type = 'Undergraduate' AND u.major = ?;");
+			"from total_unit_requirement u, met_total_unit m " +
+			"where u.type = 'Undergraduate' AND u.major = ?"	
+	);
 	tpstmt.setInt(1, student_id);
 	tpstmt.setString(2, major);
-	tpstmt.setString(3, major);
+	tpstmt.setInt(3, student_id);
+	tpstmt.setInt(4, student_id);
+	tpstmt.setString(5, major);
+	tpstmt.setString(6, major);
 	total_unit = tpstmt.executeQuery();
 	
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
-		"select c.category, SUM(t.unit) AS unit " + 
+		"(select c.category, SUM(t.unit) AS unit " + 
 		"from general_course_requirement c, courses_taken t " +
 		"where t.student_id = ? AND c.type = 'Undergraduate' AND c.major = ? AND c.course_number = t.course_number " +
 		"group by c.category)" +

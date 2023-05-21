@@ -27,7 +27,7 @@ Type:
 <select name="type" id="type">
   <option value="">Select One</option>
   <option value="Undergraduate">Undergraduate</option>
-  <option value="Graguate">Master</option>
+  <option value="Graduate">Master</option>
 </select>
 Total unit: <input type="text" name="total_unit" size="5"/>
 <input type="submit" value="Insert"/>
@@ -134,7 +134,7 @@ Type:
 <select name="type" id="type">
   <option value="">Select One</option>
   <option value="Undergraduate">Undergraduate</option>
-  <option value="Graguate">Master</option>
+  <option value="Graduate">Master</option>
 </select>
 Category: <input type="text" name="category" size="5"/>
 Minimum unit: <input type="text" name="minimum_unit" size="2"/>
@@ -258,7 +258,7 @@ Type:
 <select name="type" id="type">
   <option value="">Select One</option>
   <option value="Undergraduate">Undergraduate</option>
-  <option value="Graguate">Master</option>
+  <option value="Graduate">Graduate</option>
 </select>
 Category: <input type="text" name="category" size="5"/>
 Course Number: <input type="text" name="course_number" size="10"/>
