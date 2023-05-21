@@ -64,8 +64,8 @@ ResultSet degreeResultset = connection.createStatement().executeQuery("select * 
 <%  
 String curr_major = null;
 String curr_student = null;
-ResultSet minimum_unit = null;
-ResultSet unmet_unit = null;
+ResultSet total_unit = null;
+ResultSet category_unit = null;
 
 %>
 
@@ -108,8 +108,21 @@ if (action_major != null && action_major.equals("select_major")) {
 
 <%
 if (student_id != null && major != null) {
+	PreparedStatement tpstmt = connection.prepareStatement(
+			"With met_unit AS (" + 
+			"select SUM(t.unit) AS unit " +
+			"from courses_taken t " +
+			"where t.student_id = ? AND t.course_number IN(" +
+			"select course_number from general_course_requirement " +
+			"where type = 'Undergraduate' AND major = ?))" +
+			"select (u.total_unit - m.unit) AS unit " +
+			"from total_unit_requirement u, met_unit m " +
+			"where u.type = 'Undergraduate' AND u.major = ?;");
+	tpstmt.setInt(1, student_id);
+	tpstmt.setString(2, major);
+	tpstmt.setString(3, major);
+	total_unit = tpstmt.executeQuery();
 	
-	minimum_unit = connection.createStatement().executeQuery("select * from general_unit_requirement where type ='Undergraduate' AND major = '" + major + "'");
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
 		"select c.category, SUM(t.unit) AS unit " + 
@@ -130,42 +143,41 @@ if (student_id != null && major != null) {
 	pstmt.setString(2, major);
 	pstmt.setString(3, major);
 	pstmt.setString(4, major);
-	unmet_unit = pstmt.executeQuery();
+	category_unit = pstmt.executeQuery();
 }
 
 %>
 
 <% 
-if (minimum_unit != null) {
-	%><h2><%= major + " unit requirements"  %></h2>
+if (total_unit != null && category_unit != null) {
+	%><h2><%= major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
+	<TABLE BORDER = "1">
+	<TR>
+	<TH>remaining total_unit</TH>
+	</TR> <%
+	total_unit.next(); %>
+		 <TR>
+      <TD><%=total_unit.getInt(1) %></TD>
+      </TR>
+	
+	</TABLE>
+<br><br>
+
+	<h2><%= "Remaining Category Unit Requirement for " + student_name + ", " + student_id %></h2>
 	<TABLE BORDER = "1">
 	<TR>
 	<TH>category</TH>
-	<TH>minimum_unit</TH>
+	<TH>remaining unit</TH>
 	</TR> <%
-	while(minimum_unit.next()) { %>
+	while(category_unit.next()) { %>
 		 <TR>
-      <TD><%=minimum_unit.getString(3) %></TD>
-      <TD><%=minimum_unit.getInt(4) %></TD>
+      <TD><%=category_unit.getString(1) %></TD>
+      <TD><%=category_unit.getInt(2) %></TD>
       </TR>
-	<%}
-}
-if (unmet_unit != null) {
-	%><h2><%= "unmet unit requirement for " + student_name  %></h2>
-	<TABLE BORDER = "1">
-	<TR>
-	<TH>category</TH>
-	<TH>unmet unit</TH>
-	</TR> <%
-	while(unmet_unit.next()) { %>
-		 <TR>
-      <TD><%=unmet_unit.getString(1) %></TD>
-      <TD><%=unmet_unit.getInt(2) %></TD>
-      </TR>
-	<%}
-}
-%>
-</TABLE>
+	<%}%>
+	</TABLE>
+<%}%>
+
 
 <% 
 /* resultset.close(); */

@@ -18,7 +18,114 @@ table {
  </TR>
 </TABLE>
 
-<H2>Adding Degree</H2>
+<H2>Adding Degree Total Unit Requirement</H2>
+<form name = "f1" method="get">
+<input type="hidden" value="insert_t" name="action_t">
+Major: <input type="text" name="major" size="5"/>
+Type: 
+<%--<input type="text" name="type" size="5"/> --%>
+<select name="type" id="type">
+  <option value="">Select One</option>
+  <option value="Undergraduate">Undergraduate</option>
+  <option value="Graguate">Master</option>
+</select>
+Total unit: <input type="text" name="total_unit" size="5"/>
+<input type="submit" value="Insert"/>
+</form>
+
+<%
+String action_t = request.getParameter("action_t");
+if (action_t != null && action_t.equals("insert_t")) {
+	Connection conn = ConnectionProvider.getCon();
+	conn.setAutoCommit(false);
+	// Create the prepared statement and use it to
+	// INSERT the general_unit_requirement attrs INTO the general_unit_requirement table.
+	PreparedStatement pstmt = conn.prepareStatement(
+	("INSERT INTO total_unit_requirement VALUES (?, ?, ?)"));
+	pstmt.setString(1, request.getParameter("major"));
+	pstmt.setString(2, request.getParameter("type"));
+	pstmt.setInt(3, Integer.parseInt(request.getParameter("total_unit")));
+
+	pstmt.executeUpdate();
+	conn.commit();
+	conn.setAutoCommit(true);
+	conn.close();
+}
+
+if (action_t != null && action_t.equals("update_t")) {
+	try{
+	Connection conn = ConnectionProvider.getCon();
+	conn.setAutoCommit(false);
+	// Create the prepared statement and use it to
+	// UPDATE the general_unit_requirement attributes in the general_unit_requirement table.
+	PreparedStatement pstmt = conn.prepareStatement(
+	"UPDATE total_unit_requirement SET total_unit = ? WHERE major = ? AND type = ?");	
+	pstmt.setInt(1,Integer.parseInt(request.getParameter("total_unit")));
+	pstmt.setString(2, request.getParameter("major"));	
+ 	pstmt.setString(3, request.getParameter("type"));
+
+
+	// out.println(pstmt.toString());
+	// System.out.println(pstmt.toString());
+	int rowCount = pstmt.executeUpdate();
+	conn.commit();
+	conn.setAutoCommit(true);
+	conn.close();
+	}catch(Exception ex){
+		System.out.println(ex);
+	}
+}
+
+if (action_t != null && action_t.equals("delete_t")) {
+	Connection conn = ConnectionProvider.getCon();
+	conn.setAutoCommit(false);
+	// Create the prepared statement and use it to
+	// DELETE the general_unit_requirement FROM the general_unit_requirement table.
+	PreparedStatement pstmt = conn.prepareStatement(
+	"DELETE FROM total_unit_requirement WHERE major = ? AND type = ?");
+	pstmt.setString(1, request.getParameter("major"));
+	pstmt.setString(2, request.getParameter("type"));
+ int rowCount = pstmt.executeUpdate();
+	conn.commit();
+	conn.setAutoCommit(true);
+	conn.close();
+}
+%>
+<H2>Current Degrees Total Unit requirement</H2>
+ <%
+ Connection connection = ConnectionProvider.getCon();
+ ResultSet total_unit = connection.createStatement().executeQuery("select * from total_unit_requirement") ;
+ %>
+
+ <TABLE BORDER="1">
+ <TR>
+ <TH>major</TH>
+ <TH>type</TH>
+ <TH>total_unit</TH>
+ </TR>
+ <% while(total_unit.next()){ %>
+ <TR>
+<form action="degrees.jsp" method="get">
+ <input type="hidden" value="update_t" name="action_t">
+ <td><input value="<%= total_unit.getString(1) %>" name="major"></td> 
+ <TD><input value="<%= total_unit.getString(2) %>" name="type" ></TD>
+ <TD><input value="<%= total_unit.getInt(3) %>" name="total_unit"> </TD>
+ <td><input type="submit" value="Update"></td>
+ </form>
+
+ <form action="degrees.jsp" method="get">
+	<input type="hidden" value="delete_t" name="action_t">
+	<input type="hidden" value="<%= total_unit.getString(1) %>" name="major"> 
+ <input type="hidden" value="<%= total_unit.getString(2) %>" name="type">
+  <TD><input type="submit" value="Delete"></TD>
+	</form>
+ </TR>
+ <% } %>
+ </TABLE>
+ <br><br>
+
+
+<H2>Adding Degree Category Unit Requirement</H2>
 <form name = "f1" method="get">
 <input type="hidden" value="insert" name="action">
 Major: <input type="text" name="major" size="5"/>
@@ -102,7 +209,6 @@ if (action != null && action.equals("delete")) {
 
 <H2>Current Degrees</H2>
  <%
- Connection connection = ConnectionProvider.getCon();
  Statement statement = connection.createStatement() ;
  ResultSet resultset = statement.executeQuery("select * from general_unit_requirement") ;
  %>
