@@ -45,7 +45,7 @@ if (action_t != null && action_t.equals("insert_t")) {
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("type"));
 	pstmt.setInt(3, Integer.parseInt(request.getParameter("total_unit")));
-
+	//out.println(pstmt.toString());
 	pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);

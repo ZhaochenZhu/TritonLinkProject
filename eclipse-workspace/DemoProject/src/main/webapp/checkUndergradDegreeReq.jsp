@@ -139,7 +139,7 @@ if (student_id != null && major != null) {
 	
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
-		"(select c.category, SUM(t.unit) AS unit " + 
+		"select c.category, SUM(t.unit) AS unit " + 
 		"from general_course_requirement c, courses_taken t " +
 		"where t.student_id = ? AND c.type = 'Undergraduate' AND c.major = ? AND c.course_number = t.course_number " +
 		"group by c.category)" +
@@ -157,7 +157,9 @@ if (student_id != null && major != null) {
 	pstmt.setString(2, major);
 	pstmt.setString(3, major);
 	pstmt.setString(4, major);
+	//out.println(pstmt.toString());
 	category_unit = pstmt.executeQuery();
+	//category_unit = null;
 }
 
 %>
