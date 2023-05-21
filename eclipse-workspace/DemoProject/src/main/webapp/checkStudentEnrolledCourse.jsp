@@ -28,7 +28,7 @@ margin: auto;
 <%
 Connection connection = ConnectionProvider.getCon();
 Statement statement = connection.createStatement() ;
-ResultSet resultset = statement.executeQuery("select * from student") ;
+ResultSet resultset = statement.executeQuery("select * from student where enrolled = 'Yes'") ;
 %>
 
 <form action="checkStudentEnrolledCourse.jsp" method="get">

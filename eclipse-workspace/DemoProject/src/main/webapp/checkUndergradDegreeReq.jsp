@@ -29,7 +29,7 @@ margin: auto;
 <%
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
-ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Undergraduate'") ;
+ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Undergraduate' AND enrolled = 'Yes'") ;
 ResultSet degreeResultset = connection.createStatement().executeQuery("select * from general_unit_requirement where type = 'Undergraduate'") ;
 
 %>
