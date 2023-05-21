@@ -25,16 +25,16 @@ margin: auto;
  </TR>
 </TABLE>
     
-<h2>Select an Undergraduate Student and a major</h2>
+<h2>Select a Graduate Student and a major</h2>
 <%
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
-ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Undergraduate'") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from general_unit_requirement where type = 'Undergraduate'") ;
+ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Master") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from general_unit_requirement where type = 'Master'") ;
 
 %>
 
-<form action="checkUndergradDegreeReq.jsp" method="get">
+<form action="checkGradDegreeReq.jsp" method="get">
 <input type="hidden" value="select_student" name="action_student">
 <label for="student">Choose a student:</label>
 <select name="student" id="student">
