@@ -51,7 +51,7 @@ text-align: center
 	  
 	  <tr>
 	  <td><a href="review_session.jsp">review_session</a></td>
-	  <td><a href="produce_class_schedule.jsp">produce class schedule.jsp</a></td>
+	  <td><a href="produce_class_schedule.jsp">produce class schedule</a></td>
 	  </tr>
       <tr><td><a href="student_probation.jsp">student probation</a></td></tr> 
       <tr><td><a href="thesis_committee.jsp">thesis committee</a></td></tr>  
