@@ -165,7 +165,14 @@ if (action != null && action.equals("delete")) {
 Year: <input type="text" name="year" size="5"/>
 Section id: <input type="text" name="section_id" size="5"/>
 Course number: <input type="text" name="course_number" size="5"/>
-Type: <input type="text" name="type" size="6"/>
+Type: <%-- <input type="text" name="type" size="6"/>--%>
+<select name="type" id="type">
+  <option value="">Select One</option>
+  <option value="lecture">lecture</option>
+  <option value="discussion">discussion</option>
+  <option value="lab">lab</option>
+  <option value="review_session">review session</option>
+</select>
 Day:  <input type="text" name="day" size="6"/>
 Date: <input type="date" name="date" />
 Start time: <input type="time" name="start_time" size="12"/>
