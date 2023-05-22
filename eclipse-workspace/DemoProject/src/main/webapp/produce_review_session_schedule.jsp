@@ -23,43 +23,63 @@ margin: auto;
 	<td><a href="root.jsp">Go Back</a></td>
  </TR>
 </TABLE>
+<h1>Schedule a Review Session</h1>
+<h2>Select Course</h2>
 
-<h2>Select Student</h2>
+
+<form action="produce_review_session_schedule.jsp" method="get">
+<input type="hidden" value="select_course" name="action">
+Type in a course:
+<input type="text" placeholder="course_number" name="course_number">
+<input type="submit" value="Select">
+</form>
 <%
+String action = request.getParameter("action");
+ResultSet course_sections = null;
 Connection connection = ConnectionProvider.getCon();
 Statement statement = connection.createStatement() ;
-ResultSet resultset = statement.executeQuery("select * from student where enrolled = 'Yes'") ;
-%>
+String cur_course = "";
+ResultSet course_info = null;
+if(request.getParameter("course_number")==null || request.getParameter("course_number").equals("")){
+	cur_course = "[SELECT COURSE]";
+}else{
+	course_info = statement.executeQuery(
+			"select course_number, course_name from course_info Where course_number = '"
+			+request.getParameter("course_number")+"'");
+	course_info.next();
+	cur_course = course_info.getString(1)+" "+ course_info.getString(2);
+}
+if(action != null && action.equals("select_course")){
+	course_sections = statement.executeQuery("select section_id from section where year = 2023 AND quarter = 'Spring' AND course_number = '"
+			+request.getParameter("course_number")+"'") ;
+}
 
-<form action="produce_class_schedule.jsp" method="get">
-<input type="hidden" value="select_student" name="action">
-<label for="student">Choose a student:</label>
-<select name="student" id="student">
+
+%>
+<h2><%=cur_course %></h2>    
+<form action="produce_review_session_schedule.jsp" method="get">
+<input type="hidden" value="schedule" name="action">
+<select name="Section" id="section">
   <option value="">Select one from below</option>
-	<%while(resultset.next()){  %>
+	<%if(course_sections!=null){
+	while(course_sections.next()){  %>
   <%-- <option value="<%=resultset.getInt(1) %>"><%=resultset.getString(2)+ " "+ resultset.getString(3) %></option>--%>
-  <option value="<%=resultset.getInt(1) %>"><%=resultset.getInt(1) %></option>
-      <% } %>
+  <option value="<%=course_sections.getString(1) %>"><%=course_sections.getString(1) %></option>
+      <% } 
+      }%>
 </select>
+Start Date: <input type="date" name="start_date" />
+End Date: <input type="date" name="end_date" />
 <input type="submit" value="Select">
 </form>    
   
 <%
-String cur_student = "";
-if(request.getParameter("student")==null || request.getParameter("student").equals("")){
-	cur_student = "";
-}else{
-	resultset = statement.executeQuery(
-			"select first_name, last_name from student Where student_id = "
-			+Integer.parseInt(request.getParameter("student")));
-	resultset.next();
-	cur_student = " by "+resultset.getString(1)+" "+ resultset.getString(2);
-}
-String action = request.getParameter("action");
+
+ResultSet resultset = null;
 ResultSet conflict_course = null;
-if (action != null && action.equals("select_student")) {
-	if(request.getParameter("student").equals("")){
-		out.println("Please select a student");
+if (action != null && action.equals("schedule")) {
+	if(request.getParameter("Section").equals("")){
+		out.println("Please select a section");
 	}else{
 		resultset = statement.executeQuery("select first_name, middle_name, last_name from student WHERE student_id = "+Integer.parseInt(request.getParameter("student"))) ;
 		resultset.next();
@@ -88,7 +108,7 @@ if (action != null && action.equals("select_student")) {
 }
 %>
 
-<h2><%= "Conflict courses in current quarter"+cur_student%></h2>
+<h2><%= "Available slots for review session for "+cur_course%></h2>
 <TABLE BORDER="1">
 <TR>
 <TH>course_number</TH>
@@ -106,7 +126,7 @@ while(conflict_course.next()){ %>
 </TABLE>
 
 <% 
-resultset.close();
+//resultset.close();
 connection.close();
 %>
     
