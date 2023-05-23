@@ -156,7 +156,7 @@ while(available_slots.next()){ %>
       <TR>
       <TD><%=available_slots.getString(1) %></TD>
       <TD><%=available_slots.getString(2) %></TD>
-      <TD><%=available_slots.getString(2) %></TD>
+      <TD><%=available_slots.getString(3) %></TD>
       </TR>
 <% }
 }%>
