@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="java.sql.*, com.mit.*"%>
+    pageEncoding="UTF-8" import="java.sql.*, com.mit.*, java.text.SimpleDateFormat, java.util.*"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,7 +47,8 @@ if(request.getParameter("course_number")==null || request.getParameter("course_n
 			"select course_number, course_name from course_info Where course_number = '"
 			+request.getParameter("course_number")+"'");
 	course_info.next();
-	cur_course = course_info.getString(1)+" "+ course_info.getString(2);
+	//out.println(request.getParameter("course_number"));
+	cur_course = course_info.getString(1)+", "+course_info.getString(2);
 }
 if(action != null && action.equals("select_course")){
 	course_sections = statement.executeQuery("select section_id from section where year = 2023 AND quarter = 'Spring' AND course_number = '"
@@ -59,6 +60,7 @@ if(action != null && action.equals("select_course")){
 <h2><%=cur_course %></h2>    
 <form action="produce_review_session_schedule.jsp" method="get">
 <input type="hidden" value="schedule" name="action">
+<input type="hidden" value="<%=request.getParameter("course_number")!=null? request.getParameter("course_number"):null %>" name="course_number">
 <select name="Section" id="section">
   <option value="">Select one from below</option>
 	<%if(course_sections!=null){
@@ -74,36 +76,69 @@ End Date: <input type="date" name="end_date" />
 </form>    
   
 <%
-
 ResultSet resultset = null;
-ResultSet conflict_course = null;
+ResultSet available_slots = null;
 if (action != null && action.equals("schedule")) {
 	if(request.getParameter("Section").equals("")){
 		out.println("Please select a section");
 	}else{
-		resultset = statement.executeQuery("select first_name, middle_name, last_name from student WHERE student_id = "+Integer.parseInt(request.getParameter("student"))) ;
-		resultset.next();
-		out.println(resultset.getString(1)+","+resultset.getString(2)+","+resultset.getString(3));	
-	
-		PreparedStatement pstmt = connection.prepareStatement(
-				"with current_section as("
-					+"select c.date, c.course_number, c.start_time, c.end_time, c.year, c.section_id "
-					+"from enrollment_list_of_class e, class_meetings_times c "
-					+"where e.year = c.year AND e.course_number = c.course_number AND e.section_id = c.section_id "
-					+"AND e.student_id = ? AND c.type<>'review_session') "
-					+"select distinct m.course_number, c.course_name "
-					+"from current_section x, section y, class_meetings_times m, section z, course_info c "
-					+"where y.year = m.year AND y.course_number = m.course_number AND y.section_id = m.section_id "
-					+"and x.year = z.year AND x.course_number = z.course_number AND x.section_id = z.section_id "
-					+"and m.date=x.date and x.course_number<>y.course_number and y.quarter = z.quarter and y.year=z.year "
-					+"and c.course_number = m.course_number AND m.type<>'review_session'"
-					+"and ((TO_TIMESTAMP(m.start_time,'HH24:MI')<=TO_TIMESTAMP(x.end_time,'HH24:MI') "
-					+"and TO_TIMESTAMP(m.end_time,'HH24:MI')>=TO_TIMESTAMP(x.start_time,'HH24:MI')) "
-					+"or (TO_TIMESTAMP(x.start_time,'HH24:MI')<=TO_TIMESTAMP(m.end_time,'HH24:MI') "
-					+"and TO_TIMESTAMP(x.end_time,'HH24:MI')<=TO_TIMESTAMP(m.start_time,'HH24:MI')))");
-		pstmt.setInt(1, Integer.parseInt(request.getParameter("student")));
-		conflict_course = pstmt.executeQuery();
-		//out.println(pstmt.toString());
+		String start_date = request.getParameter("start_date");
+		String end_date = request.getParameter("end_date");
+		
+		//add dates into table
+		try{
+			Calendar c = Calendar.getInstance();
+			statement.executeUpdate("DELETE FROM review_session_range");
+			PreparedStatement pstmt = connection.prepareStatement("Insert into review_session_range values (?)");
+	        while(!start_date.equals(end_date)){
+	        	pstmt.setString(1, start_date);
+	        	int rowCount = pstmt.executeUpdate();
+	        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");		        
+		        c.setTime(sdf.parse(start_date));
+		        c.add(Calendar.DATE, 1);  // add 1 day
+		        start_date = sdf.format(c.getTime());  
+	        }
+	        pstmt.setString(1, start_date);
+        	int rowCount = pstmt.executeUpdate(); //append end date
+		}catch(Exception ex){
+			out.println(ex);
+		}
+		
+		PreparedStatement query_slot = connection.prepareStatement("with available_spot as( "
+				+"select * "
+				+"from review_session_range r, review_session_times t "
+				+"), "
+				+"other_classes as( "
+				+"SELECT DISTINCT o.year, o.course_number, o.section_id "
+				+"FROM student s, section c, enrollment_list_of_class e, section o, enrollment_list_of_class e_o "
+				+"WHERE e.course_number = c.course_number AND e.year = c.year AND e.section_id = c.section_id AND e.student_id = s.student_id AND "
+				+"e.course_number = ? AND e.section_id = ? AND e_o.course_number = o.course_number AND e_o.year = o.year "
+				+"AND e_o.section_id = o.section_id AND e_o.student_id = s.student_id " 
+				+"), "
+				+"conflict_slot as( "
+				+"select distinct a.date, a.start_time, a.end_time "
+				+"from available_spot a, other_classes y, class_meetings_times m "
+				+"where y.year = m.year AND y.course_number = m.course_number AND y.section_id = m.section_id "
+				+"and a.date = m.date "
+				+"and ((TO_TIMESTAMP(m.start_time,'HH24:MI')<=TO_TIMESTAMP(a.end_time,'HH24:MI') " 
+				+"and TO_TIMESTAMP(m.end_time,'HH24:MI')>=TO_TIMESTAMP(a.start_time,'HH24:MI')) "
+				+"or (TO_TIMESTAMP(a.start_time,'HH24:MI')<=TO_TIMESTAMP(m.end_time,'HH24:MI') " 
+				+"and TO_TIMESTAMP(a.end_time,'HH24:MI')>=TO_TIMESTAMP(m.start_time,'HH24:MI'))) "
+				+"), "
+				+"valid_timestamp as( "
+				+"select date, TO_TIMESTAMP(start_time,'HH24:MI')::TIME as start_time, TO_TIMESTAMP(end_time,'HH24:MI')::TIME as end_time from available_spot "
+				+"EXCEPT (select date, TO_TIMESTAMP(start_time,'HH24:MI')::TIME as start_time, TO_TIMESTAMP(end_time,'HH24:MI')::TIME as end_time from conflict_slot) "
+				+"order by date, start_time "
+				+") "
+				+"SELECT date, to_char(start_time, 'HH24:MI'), to_char(end_time, 'HH24:MI') "
+				+"from valid_timestamp");
+		query_slot.setString(1, request.getParameter("course_number"));
+		query_slot.setString(2, request.getParameter("Section"));
+		available_slots = query_slot.executeQuery();
+		//out.println(request.getParameter("course_number")+request.getParameter("section_id"));
+		//out.println(request.getParameter("course_number"));
+		//out.println(query_slot.toString());
+		
 	}
 }
 %>
@@ -111,15 +146,17 @@ if (action != null && action.equals("schedule")) {
 <h2><%= "Available slots for review session for "+cur_course%></h2>
 <TABLE BORDER="1">
 <TR>
-<TH>course_number</TH>
-<TH>course_name</TH>
+<TH>date</TH>
+<TH>start_time</TH>
+<TH>end_time</TH>
 </TR>
 <% 
-if(conflict_course!=null){
-while(conflict_course.next()){ %>
+if(available_slots!=null){
+while(available_slots.next()){ %>
       <TR>
-      <TD><%=conflict_course.getString(1) %></TD>
-      <TD><%=conflict_course.getString(2) %></TD>
+      <TD><%=available_slots.getString(1) %></TD>
+      <TD><%=available_slots.getString(2) %></TD>
+      <TD><%=available_slots.getString(2) %></TD>
       </TR>
 <% }
 }%>
