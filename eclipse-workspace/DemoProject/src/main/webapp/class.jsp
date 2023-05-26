@@ -60,7 +60,7 @@ if (action != null && action.equals("insert")) {
 	pstmt.setString(2, request.getParameter("section_id"));
 	pstmt.setString(3, request.getParameter("course_number"));
 	pstmt.setString(4, request.getParameter("quarter"));
-	pstmt.setInt(5, Integer.parseInt(request.getParameter("units")));
+	pstmt.setString(5, request.getParameter("units"));
 	pstmt.setString(6, request.getParameter("start_date"));
 	pstmt.setString(7, request.getParameter("end_date"));
 	pstmt.setString(8, request.getParameter("professor"));
@@ -79,7 +79,7 @@ if (action != null && action.equals("update")) {
 	PreparedStatement pstmt = conn.prepareStatement(
 	"UPDATE section SET quarter = ?, units = ?, start_date = ?, end_date = ?, professor = ?, grading_option = ? WHERE year = ? AND section_id = ? AND course_number = ?");	
 	pstmt.setString(1, request.getParameter("quarter"));
-    pstmt.setInt(2, Integer.parseInt(request.getParameter("units")));
+    pstmt.setString(2, request.getParameter("units"));
 	pstmt.setString(3, request.getParameter("start_date"));
 	pstmt.setString(4, request.getParameter("end_date"));	
 	pstmt.setString(5, request.getParameter("professor"));
@@ -141,7 +141,7 @@ if (action != null && action.equals("delete")) {
 	  <td><input value="<%= resultset.getString(2) %>" name="section_id"></td>      
       <TD><input value="<%= resultset.getString(3) %>" name="course_number"></TD>
       <TD><input value="<%= resultset.getString(4) %>" name="quarter"></TD>
-      <TD><input value="<%= resultset.getInt(5) %>" name="units"> </TD>
+      <TD><input value="<%= resultset.getString(5) %>" name="units"> </TD>
       <TD><input type = "date" value="<%= resultset.getString(6) %>" name="start_date"></TD>
       <TD><input type = "date" value="<%= resultset.getString(7) %>" name="end_date"> </TD>
       <TD><input value="<%= resultset.getString(8) %>" name="professor"></TD>

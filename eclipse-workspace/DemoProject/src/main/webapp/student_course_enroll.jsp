@@ -59,6 +59,8 @@ Course number: <input type="text" name="course_number"/>
       <TH>Start Date</TH>
       <TH>End Date</TH>
       <TH>Grading Option</TH>
+      <TH>Select unit</TH>
+      <TH>Select grading option</TH>
       </TR>
       <% if(section!=null){
     	  boolean found = false;
@@ -70,7 +72,7 @@ Course number: <input type="text" name="course_number"/>
       <td><input type="text" value="<%= section.getString(3) %>" name="course_number" readonly></td>
 	  <td><input type="text" value="<%= section.getString(2) %>" name="section_id" readonly></td> 
 	  <td><input type="text" value="<%= section.getString(8) %>" name="professor" readonly></td>	  
-      <TD><input type="text" value="<%= section.getInt(5) %>" name="units" readonly></TD>
+      <TD><input type="text" value="<%= section.getString(5) %>" name="units" readonly></TD>
       <TD><input type="date" value="<%= section.getString(6) %>" name="start_date" readonly></TD>
       <TD><input type="date" value="<%= section.getString(7) %>" name="end_date" readonly></TD>
       <TD><input type="text" value="<%= section.getString(9) %>" name="grading_option" readonly></TD>      
@@ -80,7 +82,19 @@ Course number: <input type="text" name="course_number"/>
 		<input type="hidden" value="<%= section.getInt(1) %>" name="year">
 		<input type="hidden" value="<%= section.getString(2) %>" name="section_id">
 		<input type="hidden" value="<%= section.getString(3) %>" name="course_number">
-		<input type="hidden" value="<%= section.getInt(5) %>" name="units">
+		<TD><select name="units" id="units">
+		  <option value="">Select One</option>
+		  <%if(section.getString(5).contains("-")){
+			  String[] arr = section.getString(5).split("-");
+			  int lower = Integer.parseInt(arr[0]);
+			  int higher = Integer.parseInt(arr[1]);
+			  for(int i=lower;i<=higher;i++){%>
+				  <option value="<%=i%>"><%=i%></option>
+			  <%}
+		  }else{%>
+			  <option value="<%=section.getString(5)%>"><%=section.getString(5)%></option>
+		  <%}%>
+		</select></TD>
 		<input type="hidden" value="<%= request.getParameter("student_id") %>" name="student_id">
 		<TD><select name="grading_option" id="grading_option">
 		  <option value="">Select One</option>
