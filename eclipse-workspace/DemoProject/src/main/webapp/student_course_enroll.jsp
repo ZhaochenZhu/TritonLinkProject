@@ -44,7 +44,7 @@ Course number: <input type="text" name="course_number"/>
 <%
 	Connection connection = ConnectionProvider.getCon();
 	PreparedStatement pstmt = connection.prepareStatement(
-		"SELECT * From section WHERE course_number = ? AND year = 2023 AND quarter ='SP'");
+		"SELECT * From section WHERE course_number = ? AND year = 2023 AND quarter ='Spring'");
 	pstmt.setString(1, request.getParameter("course_number"));
 	ResultSet section = pstmt.executeQuery();
 	boolean search = false;
@@ -59,6 +59,8 @@ Course number: <input type="text" name="course_number"/>
       <TH>Start Date</TH>
       <TH>End Date</TH>
       <TH>Grading Option</TH>
+      <TH>Select unit</TH>
+      <TH>Select grading option</TH>
       </TR>
       <% if(section!=null){
     	  boolean found = false;
@@ -70,7 +72,7 @@ Course number: <input type="text" name="course_number"/>
       <td><input type="text" value="<%= section.getString(3) %>" name="course_number" readonly></td>
 	  <td><input type="text" value="<%= section.getString(2) %>" name="section_id" readonly></td> 
 	  <td><input type="text" value="<%= section.getString(8) %>" name="professor" readonly></td>	  
-      <TD><input type="text" value="<%= section.getInt(5) %>" name="units" readonly></TD>
+      <TD><input type="text" value="<%= section.getString(5) %>" name="units" readonly></TD>
       <TD><input type="date" value="<%= section.getString(6) %>" name="start_date" readonly></TD>
       <TD><input type="date" value="<%= section.getString(7) %>" name="end_date" readonly></TD>
       <TD><input type="text" value="<%= section.getString(9) %>" name="grading_option" readonly></TD>      
@@ -80,10 +82,20 @@ Course number: <input type="text" name="course_number"/>
 		<input type="hidden" value="<%= section.getInt(1) %>" name="year">
 		<input type="hidden" value="<%= section.getString(2) %>" name="section_id">
 		<input type="hidden" value="<%= section.getString(3) %>" name="course_number">
-		<input type="hidden" value="<%= section.getInt(5) %>" name="units">
+		<TD><select name="units" id="units">
+		  <%if(section.getString(5).contains("-")){
+			  String[] arr = section.getString(5).split("-");
+			  int lower = Integer.parseInt(arr[0]);
+			  int higher = Integer.parseInt(arr[1]);
+			  for(int i=lower;i<=higher;i++){%>
+				  <option value="<%=i%>"><%=i%></option>
+			  <%}
+		  }else{%>
+			  <option value="<%=section.getString(5)%>"><%=section.getString(5)%></option>
+		  <%}%>
+		</select></TD>
 		<input type="hidden" value="<%= request.getParameter("student_id") %>" name="student_id">
 		<TD><select name="grading_option" id="grading_option">
-		  <option value="">Select One</option>
 		  <option value="letter_grade">Letter Grade</option>
 		  <option value="s_u">S/U</option>
 		</select></TD>
@@ -143,16 +155,33 @@ if (action != null && action.equals("change_grading")) {
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
 	
-	pstmt = conn.prepareStatement("SELECT grading_option FROM section WHERE year = ? AND section_id = ? AND course_number = ?");
+	pstmt = conn.prepareStatement("SELECT grading_option, units FROM section WHERE year = ? AND section_id = ? AND course_number = ?");
 	pstmt.setInt(1,2023);
 	pstmt.setString(2,request.getParameter("section_id"));
 	pstmt.setString(3,request.getParameter("course_number"));
 	ResultSet resultset = pstmt.executeQuery();
 	boolean has_grading_option = false;
+	boolean unit_in_range = false;
+	out.println("execute query");
+	
 	if(resultset.next() && (resultset.getString(1).equals(request.getParameter("grading_option")))||resultset.getString(1).equals("both")){
 		has_grading_option = true;
+		out.println("has grading option");
+		String unit_range = resultset.getString(2);
+		if(unit_range.contains("-")){
+			out.println("multi unit choice");
+			String[] arr = unit_range.split("-");
+			int lower = Integer.parseInt(arr[0]);
+			int higher = Integer.parseInt(arr[1]);
+			unit_in_range = (Integer.parseInt(request.getParameter("unit"))>=lower )
+					&& (Integer.parseInt(request.getParameter("unit"))<=higher);
+		}else{
+			out.println("single unit choice");
+			unit_in_range = Integer.parseInt(request.getParameter("unit"))==Integer.parseInt(unit_range);
+		}
 	}
-	if(has_grading_option){
+	if(has_grading_option && unit_in_range){
+		out.println("update course");
 	pstmt = conn.prepareStatement(
 	("UPDATE enrollment_list_of_class SET grading_option = ?, unit = ? WHERE year = ? AND section_id = ? AND course_number = ? AND student_id = ?"));
 	pstmt.setString(1,request.getParameter("grading_option"));
@@ -164,6 +193,9 @@ if (action != null && action.equals("change_grading")) {
 	//out.println(pstmt.toString());
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
+	}
+	else{
+		out.println("invalid update attempt");
 	}
 	conn.setAutoCommit(true);
 	}catch(Exception ex){
