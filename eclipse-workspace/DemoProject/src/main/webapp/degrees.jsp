@@ -9,7 +9,7 @@ table {
 }
 </style>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Degrees</title>
 </head>
 <body>
 <TABLE>
@@ -373,7 +373,7 @@ Minimum grade: <input type="text" name="minimum_grade" size="5"/>
 String action_mc = request.getParameter("action_mc");
 if (action_mc != null && action_mc.equals("insert_mc")) {
 	Connection conn = ConnectionProvider.getCon();
-	conn.setAutoCommit(false);
+	
 	// Create the prepared statement and use it to
 	// INSERT the general_unit_requirement attrs INTO the master_concentration_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
@@ -381,15 +381,14 @@ if (action_mc != null && action_mc.equals("insert_mc")) {
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("concentration"));
 	pstmt.setInt(3, Integer.parseInt(request.getParameter("minimum_unit")));
- pstmt.setString(4, request.getParameter("minimum_grade"));
+ 	pstmt.setString(4, request.getParameter("minimum_grade"));
 	pstmt.executeUpdate();
-	conn.commit();
-	conn.setAutoCommit(true);
+
 	conn.close();
 }
 
-if (action != null && action.equals("update_mc")) {
-	try{
+if (action_mc != null && action_mc.equals("update_mc")) {
+	
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
@@ -397,9 +396,9 @@ if (action != null && action.equals("update_mc")) {
 	PreparedStatement pstmt = conn.prepareStatement(
 	"UPDATE master_concentration_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND concentration = ?");	
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
- pstmt.setString(2, request.getParameter("minimum_grade"));
+ 	pstmt.setString(2, request.getParameter("minimum_grade"));
 	pstmt.setString(3, request.getParameter("major"));	
- pstmt.setString(4, request.getParameter("concentration"));
+	pstmt.setString(4, request.getParameter("concentration"));
 
 
 	// out.println(pstmt.toString());
@@ -408,12 +407,10 @@ if (action != null && action.equals("update_mc")) {
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
-	}catch(Exception ex){
-	System.out.println(ex);
-	}
+	
 }
 
-if (action != null && action.equals("delete_mc")) {
+if (action_mc != null && action_mc.equals("delete_mc")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
@@ -457,7 +454,7 @@ if (action != null && action.equals("delete_mc")) {
  <form action="degrees.jsp" method="get">
 	<input type="hidden" value="delete_mc" name="action_mc">
 	<input type="hidden" value="<%= resultset_mc.getString(1) %>" name="major"> 
- <input type="hidden" value="<%= resultset_mc.getString(2) %>" name="concentration">
+ 	<input type="hidden" value="<%= resultset_mc.getString(2) %>" name="concentration">
  <TD><input type="submit" value="Delete"></TD>
 	</form>
  </TR>
@@ -490,58 +487,14 @@ if (action_mr != null && action_mr.equals("insert_mr")) {
 	("INSERT INTO master_course_requirement VALUES (?, ?, ?)"));
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("concentration"));
- pstmt.setString(3, request.getParameter("course_number"));
+ 	pstmt.setString(3, request.getParameter("course_number"));
 	pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
 }
 
-/* if (action != null && action.equals("update_mc")) {
 
-	try{
-
-	Connection conn = ConnectionProvider.getCon();
-
-	conn.setAutoCommit(false);
-
-	// Create the prepared statement and use it to
-
-	// UPDATE the general_unit_requirement attributes in the general_unit_requirement table.
-
-	PreparedStatement pstmt = conn.prepareStatement(
-
-	"UPDATE master_concentration_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND concentration = ?");	
-
-	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
-
- pstmt.setString(2, request.getParameter("minimum_grade"));
-
-	pstmt.setString(3, request.getParameter("major"));	
-
- pstmt.setString(4, request.getParameter("concentration"));
-
-	
-
-	// out.println(pstmt.toString());
-
-	// System.out.println(pstmt.toString());
-
-	int rowCount = pstmt.executeUpdate();
-
-	conn.commit();
-
-	conn.setAutoCommit(true);
-
-	conn.close();
-
-	}catch(Exception ex){
-
-	System.out.println(ex);
-
-	}
-
-} */
 
 if (action_mr != null && action_mr.equals("delete_mr")) {
 	Connection conn = ConnectionProvider.getCon();
@@ -553,7 +506,7 @@ if (action_mr != null && action_mr.equals("delete_mr")) {
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("concentration"));
 	pstmt.setString(3, request.getParameter("course_number"));
- int rowCount = pstmt.executeUpdate();
+ 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();

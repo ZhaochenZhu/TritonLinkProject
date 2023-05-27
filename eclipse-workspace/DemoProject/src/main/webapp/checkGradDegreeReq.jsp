@@ -64,7 +64,9 @@ ResultSet degreeResultset = connection.createStatement().executeQuery("select * 
 String curr_major = null;
 String curr_student = null;
 ResultSet total_unit = null;
-ResultSet category_unit = null;
+ResultSet concentration_unit = null;
+ResultSet complete_conc = null;
+ResultSet incomplete_conc = null;
 
 %>
 
@@ -107,13 +109,14 @@ if (action_major != null && action_major.equals("select_major")) {
 
 <%
 if (student_id != null && major != null) {
+	// get the remaining total units for grad student for a chosen major
 	PreparedStatement tpstmt = connection.prepareStatement(
 			"With met_unit AS (" + 
 			"(select SUM(t.unit) AS unit " +
 			"from courses_taken t " +
 			"where t.student_id = ? AND t.course_number IN(" +
-			"select course_number from general_course_requirement " +
-			"where type = 'Graduate' AND major = ?)) " +
+			"select course_number from master_course_requirement " +
+			"where major = ?)) " +
 			"union " +
 			"(select 0 AS unit " +
 			"from student s " +
@@ -121,8 +124,8 @@ if (student_id != null && major != null) {
 			"select t.student_id " +
 			"from courses_taken t " +
 			"where t.student_id = ? AND t.course_number IN(" +
-			"select course_number from general_course_requirement " +
-			"where type = 'Graduate' AND major = ?))))" +
+			"select course_number from master_course_requirement " +
+			"where major = ?))))" +
 			"select (u.total_unit - m.unit) AS unit " +
 			"from total_unit_requirement u, met_unit m " +
 			"where u.type = 'Graduate' AND u.major = ?");
@@ -134,33 +137,39 @@ if (student_id != null && major != null) {
 	tpstmt.setString(6, major);
 	total_unit = tpstmt.executeQuery();
 	
+	// get the remaining units for grad student for all concentration
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
-		"select c.category, SUM(t.unit) AS unit " + 
-		"from general_course_requirement c, courses_taken t " +
-		"where t.student_id = ? AND c.type = 'Graduate' AND c.major = ? AND c.course_number = t.course_number " +
-		"group by c.category)" +
-		"(select u.category, (u.minimum_unit - m.unit) AS unit " +
-		"from general_unit_requirement u, met_unit m " +
-		"where u.type = 'Graduate' AND u.major = ? AND u.category = m.category)" +
+		"select c.concentration, SUM(t.unit) AS unit " + 
+		"from master_course_requirement c, courses_taken t " +
+		"where t.student_id = ? AND c.major = ? AND c.course_number = t.course_number " +
+		"group by c.concentration)" +
+		"(select u.concentration, (u.minimum_unit - m.unit) AS unit " +
+		"from master_concentration_requirement u, met_unit m " +
+		"where u.major = ? AND u.concentration = m.concentration)" +
 		"union " +
-		"(select u.category, u.minimum_unit " +
-		"from general_unit_requirement u " +
-		"where u.type = 'Graduate' AND u.major = ? AND u.category NOT IN (Select category from met_unit));"
-		
-			
+		"(select u.concentration, u.minimum_unit " +
+		"from master_concentration_requirement u " +
+		"where u.major = ? AND u.concentration NOT IN (Select concentration from met_unit));"
 	);
 	pstmt.setInt(1, student_id);
 	pstmt.setString(2, major);
 	pstmt.setString(3, major);
 	pstmt.setString(4, major);
-	category_unit = pstmt.executeQuery();
+	concentration_unit = pstmt.executeQuery();
+	
+	// get the completed concentration
+	
+	/* PreparedStatement cpstmt = connection.prepareStatement(
+			); */
+	
+	// get untaken future courses of all the concentrations.
 }
 
 %>
 
 <% 
-if (total_unit != null && category_unit != null) {
+if (total_unit != null && concentration_unit != null && complete_conc != null) {
 	%><h2><%= major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
 	<TABLE BORDER = "1">
 	<TR>
@@ -174,16 +183,16 @@ if (total_unit != null && category_unit != null) {
 	</TABLE>
 <br><br>
 
-	<h2><%= "Remaining Category Unit Requirement for " + student_name + ", " + student_id %></h2>
+	<h2><%= "Remaining Concentration Unit Requirement for " + student_name + ", " + student_id %></h2>
 	<TABLE BORDER = "1">
 	<TR>
-	<TH>category</TH>
+	<TH>concentration</TH>
 	<TH>remaining unit</TH>
 	</TR> <%
-	while(category_unit.next()) { %>
+	while(concentration_unit.next()) { %>
 		 <TR>
-      <TD><%=category_unit.getString(1) %></TD>
-      <TD><%=category_unit.getInt(2) %></TD>
+      <TD><%=concentration_unit.getString(1) %></TD>
+      <TD><%=concentration_unit.getInt(2) %></TD>
       </TR>
 	<%}%>
 	</TABLE>
