@@ -65,8 +65,8 @@ String curr_major = null;
 String curr_student = null;
 ResultSet total_unit = null;
 ResultSet concentration_unit = null;
-ResultSet complete_conc = null;
-ResultSet incomplete_conc = null;
+ResultSet conc_gpa = null;
+ResultSet future_courses = null;
 
 %>
 
@@ -160,16 +160,77 @@ if (student_id != null && major != null) {
 	
 	// get the completed concentration
 	
-	/* PreparedStatement cpstmt = connection.prepareStatement(
-			); */
+	PreparedStatement met_concentration = connection.prepareStatement(
+		"With  conc_gpa AS ( " 
+		+"select CAST(sum(c.unit * g.number_grade)/sum(c.unit) AS DECIMAL(10,2)) as conc_gpa, c.concentration "
+		+"from grade_conversion g, (Select t.course_number, t.unit, t.grade, t.grading_option, m.concentration  "
+			+"From courses_taken t, master_course_requirement m "	
+			+"Where m.course_number = t.course_number  "
+		  +"AND m.major = ? "
+			+"AND t.student_id = ? ) c "
+		+"where c.grade = g.letter_grade  "
+		+"GROUP BY c.concentration),  "
+		
+		+"met_unit AS (" 
+		+"select c.concentration, SUM(t.unit) AS unit "  
+		+"from master_course_requirement c, courses_taken t " 
+		+"where t.student_id = ? AND c.major = ? AND c.course_number = t.course_number " 
+		+"GROUP BY c.concentration) "
+		
+		+"Select m.concentration, g.conc_gpa, u.unit "
+		+"from master_concentration_requirement m, conc_gpa g, met_unit u, grade_conversion c "
+		+"where m.major = ? "
+		+"AND c.letter_grade = m.minimum_grade "
+		+"AND m.minimum_unit <= u.unit "
+		+"AND c.number_grade <= g.conc_gpa " 
+	);
+	met_concentration.setString(1, major);
+	met_concentration.setInt(2, student_id);
+	met_concentration.setInt(3, student_id);
+	met_concentration.setString(4, major);
+	met_concentration.setString(5, major);
+
+	conc_gpa = met_concentration.executeQuery();
+				
 	
 	// get untaken future courses of all the concentrations.
+	PreparedStatement ft = connection.prepareStatement(
+		"With untaken AS ( "
+		+"select distinct m.course_number "
+		+"from master_course_requirement m "
+		+"Where m.major = ? AND m.course_number NOT IN ("
+			+"(SELECT t.course_number from courses_taken t "
+			+"WHERE t.student_id = ?) "
+			+"UNION"
+			+"(SELECT p.course_number from courses_taken t, past_names p "
+			+"WHERE t.student_id = ? AND t.course_number = p.past_names))), "
+		+"quarter_number AS ( "
+		+"select s.course_number, (q.number + s.year * 4) AS quarter_num, s.quarter, s.year, s.section_id "
+		+"from section s, quarter_conversion q "
+		+"where q.quarter = s.quarter)"
+		+"select u.course_number, q.year, q.quarter, q.section_id "
+		+"from untaken u, quarter_number q " 
+		+"where u.course_number = q.course_number "
+		+"AND q.quarter_num > (2023 *4 + 2) AND NOT EXISTS ( "
+			+"select * from untaken x, quarter_number y "
+			+"where x.course_number = u.course_number "
+			+"AND y.course_number = x.course_number "
+			+"AND y.quarter_num > (2023 *4 + 2) "
+			+"AND y.quarter_num < q.quarter_num) "
+	);
+	ft.setString(1, major);
+	ft.setInt(2, student_id);
+	ft.setInt(3, student_id);
+	
+	future_courses = ft.executeQuery();
+	
+	
 }
 
 %>
 
 <% 
-if (total_unit != null && concentration_unit != null && complete_conc != null) {
+if (total_unit != null ) {
 	%><h2><%= major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
 	<TABLE BORDER = "1">
 	<TR>
@@ -182,7 +243,8 @@ if (total_unit != null && concentration_unit != null && complete_conc != null) {
 	
 	</TABLE>
 <br><br>
-
+<%}
+if (concentration_unit != null) {%>
 	<h2><%= "Remaining Concentration Unit Requirement for " + student_name + ", " + student_id %></h2>
 	<TABLE BORDER = "1">
 	<TR>
@@ -198,7 +260,52 @@ if (total_unit != null && concentration_unit != null && complete_conc != null) {
 	</TABLE>
 <%}%>
 
+
+<% if(conc_gpa!=null){	%>
+	<h3><%="Met Concentration"%></h3>
+		<TABLE BORDER="1">
+		<TR>
+		<TH>concentration</TH>
+		<TH>concentration GPA</TH>		
+		<TH>concentration unit</TH>
+		</TR>
+		
+		<% while(conc_gpa.next()) { %>
+			<TR>
+			<TD><%= conc_gpa.getString(1)%></TD>
+			<TD><%=conc_gpa.getFloat(2) %></TD>
+			<TD><%=conc_gpa.getInt(3) %></TD>
+			</TR>
+		<% } %>		
+		
+		</TABLE>
+			
+<% }%>
+
     
+<% if(future_courses != null) { %>
+	<h3><%="Untaken future courses"%></h3>
+		<TABLE BORDER="1">
+		<TR>
+		<TH>Course Number</TH>
+		<TH>Year</TH>		
+		<TH>Quarter</TH>
+		<TH>Section ID</TH>
+		</TR>
+		
+		<% while(future_courses.next()) { %>
+			<TR>
+			<TD><%= future_courses.getString(1)%></TD>
+			<TD><%= future_courses.getInt(2) %></TD>
+			<TD><%= future_courses.getString(3) %></TD>
+			<TD><%= future_courses.getString(4) %></TD>
+			</TR>
+		<% } %>		
+		
+		</TABLE>
+
+
+<%} %>
 </body>
 </html>
   
