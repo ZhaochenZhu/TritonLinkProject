@@ -70,6 +70,7 @@ if (action != null && action.equals("select_student")) {
 					+"FROM enrollment_list_of_class e, section s "
 					+"WHERE e.student_id = ? "
 					+"AND e.year = 2023 "
+					+"and e.course_number = s.course_number "
 					+"AND e.section_id = s.section_id "
 					+"AND s.quarter = 'Spring'");
 		pstmt.setInt(1, Integer.parseInt(request.getParameter("student")));
