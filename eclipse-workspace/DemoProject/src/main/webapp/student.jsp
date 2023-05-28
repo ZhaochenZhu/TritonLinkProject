@@ -15,6 +15,7 @@ table {
 <TABLE>
       <TR>
 		<td><a href="root.jsp">Go Back</a></td>
+		<td><a href="student_period_attendance.jsp">Register Attendance</a></td>
     </TR>
 </TABLE>
 
@@ -26,13 +27,13 @@ First name: <input type="text" name="first_name" size="5"/>
 Last name: <input type="text" name="last_name" size="5"/>
 Middle name: <input type="text" name="middle_name" size="2"/>
 SSN: <input type="text" name="ssn" size="5"/>
-<%--Enrolled: <input type="text" name="enrolled" size="2"/>--%>
+<%--Enrolled: <input type="text" name="enrolled" size="2"/>
 Enrolled:
 <select name="enrolled" id="enrolled">
   <option value="">Select One</option>
   <option value="Yes">Yes</option>
   <option value="No">No</option>
-</select>
+</select>--%>
 <%--Residential_status: <input type="text" name="residential_status" size="5"/>--%>
 Residential_status:
 <select name="residential_status" id="residential_status">
@@ -58,17 +59,20 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO student VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
+	("INSERT INTO student VALUES (?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));
 	pstmt.setString(2, request.getParameter("first_name"));
 	pstmt.setString(3, request.getParameter("last_name"));
 	pstmt.setString(4, request.getParameter("middle_name"));
 	pstmt.setInt(5, Integer.parseInt(request.getParameter("ssn")));
-	pstmt.setString(6, request.getParameter("enrolled"));
-	pstmt.setString(7, request.getParameter("residential_status"));
-	pstmt.setString(8, request.getParameter("current_degree"));
+	pstmt.setString(6, request.getParameter("residential_status"));
+	pstmt.setString(7, request.getParameter("current_degree"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e);
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -248,15 +252,14 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Student table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE student SET first_name = ?, last_name = ?, middle_name = ?, ssn = ?, enrolled = ?, residential_status = ?, current_degree = ? WHERE student_id = ?");	
+	"UPDATE student SET first_name = ?, last_name = ?, middle_name = ?, ssn = ?, residential_status = ?, current_degree = ? WHERE student_id = ?");	
 	pstmt.setString(1, request.getParameter("first_name"));
 	pstmt.setString(2, request.getParameter("last_name"));
 	pstmt.setString(3, request.getParameter("middle_name"));	
 	pstmt.setInt(4, Integer.parseInt(request.getParameter("ssn")));
-	pstmt.setString(5, request.getParameter("enrolled"));
-	pstmt.setString(6, request.getParameter("residential_status"));
-	pstmt.setString(7, request.getParameter("current_degree"));
-	pstmt.setInt(8,Integer.parseInt(request.getParameter("student_id")));
+	pstmt.setString(5, request.getParameter("residential_status"));
+	pstmt.setString(6, request.getParameter("current_degree"));
+	pstmt.setInt(7,Integer.parseInt(request.getParameter("student_id")));
 	
 	// out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
@@ -285,7 +288,7 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-           ResultSet resultset = statement.executeQuery("select * from student") ;
+           ResultSet resultset = statement.executeQuery("select * from student order by student_id") ;
        %>
       <TABLE BORDER="1">
       <TR>
@@ -307,9 +310,8 @@ if (action != null && action.equals("delete")) {
       <TD><input value="<%= resultset.getString(3) %>" name="last_name"></TD>
       <TD><input value="<%= resultset.getString(4) %>" name="middle_name"></TD>
       <TD><input value="<%= resultset.getInt(5) %>" name="ssn"> </TD>
-      <TD><input value="<%= resultset.getString(6) %>" name="enrolled"></TD>
-      <TD><input value="<%= resultset.getString(7) %>" name="residential_status"> </TD>
-      <TD><input value="<%= resultset.getString(8) %>" name="current_degree"></TD>
+      <TD><input value="<%= resultset.getString(6) %>" name="residential_status"> </TD>
+      <TD><input value="<%= resultset.getString(7) %>" name="current_degree"></TD>
       <td><input type="submit" value="Update"></td>
       </form>
        <form action="student.jsp" method="get">
@@ -385,7 +387,7 @@ if (action != null && action.equals("delete_minor")) {
        <%
            connection = ConnectionProvider.getCon();
            statement = connection.createStatement() ;
-           ResultSet college = statement.executeQuery("select * from undergraduate_student");          
+           ResultSet college = statement.executeQuery("select * from undergraduate_student order by student_id");          
        %>
       <TABLE BORDER="1">
       <TR>
@@ -416,7 +418,7 @@ if (action != null && action.equals("delete_minor")) {
       </TR>
       <br>
       <% 
-      ResultSet major = statement.executeQuery("select * from undergraduate_major");
+      ResultSet major = statement.executeQuery("select * from undergraduate_major order by student_id");
       while(major.next()){ %>
       <TR>
       <form action="student.jsp" method="get">
@@ -435,7 +437,7 @@ if (action != null && action.equals("delete_minor")) {
       </TR>
       <br>
       <% 
-      ResultSet minor = statement.executeQuery("select * from undergraduate_minor");
+      ResultSet minor = statement.executeQuery("select * from undergraduate_minor order by student_id");
       while(minor.next()){ %>
       <TR>
       <form action="student.jsp" method="get">
@@ -489,7 +491,7 @@ if (action != null && action.equals("delete_master")) {
        <%
            connection = ConnectionProvider.getCon();
            statement = connection.createStatement() ;
-           resultset = statement.executeQuery("select * from master_student") ;
+           resultset = statement.executeQuery("select * from master_student order by student_id") ;
        %>
       <TABLE BORDER="1">
       <TR>
@@ -557,7 +559,7 @@ if (action != null && action.equals("delete_phd")) {
        <%
            connection = ConnectionProvider.getCon();
            statement = connection.createStatement() ;
-           resultset = statement.executeQuery("select * from phd_student") ;
+           resultset = statement.executeQuery("select * from phd_student order by student_id") ;
        %>
       <TABLE BORDER="1">
       <TR>
