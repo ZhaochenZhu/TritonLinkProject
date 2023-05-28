@@ -28,7 +28,8 @@ margin: auto;
 <%
 Connection connection = ConnectionProvider.getCon();
 Statement statement = connection.createStatement() ;
-ResultSet resultset = statement.executeQuery("select * from student where enrolled = 'Yes'") ;
+ResultSet resultset = statement.executeQuery("select * from student_period_attendance where quarter = 'Spring' "
+		 +"AND year = 2023 AND enrolled = 'Yes'") ;
 %>
 
 <form action="produce_class_schedule.jsp" method="get">
