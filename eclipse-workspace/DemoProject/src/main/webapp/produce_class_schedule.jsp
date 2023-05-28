@@ -72,12 +72,12 @@ if (action != null && action.equals("select_student")) {
 					+"from enrollment_list_of_class e, class_meetings_times c "
 					+"where e.year = c.year AND e.course_number = c.course_number AND e.section_id = c.section_id "
 					+"AND e.student_id = ? AND c.type<>'review_session') "
-					+"select distinct m.course_number, c.course_name, z.course_number "
-					+"from current_section x, section y, class_meetings_times m, section z, course_info c "
+					+"select distinct m.course_number, c.course_name, z.course_number ,d.course_name "
+					+"from current_section x, section y, class_meetings_times m, section z, course_info c, course_info d "
 					+"where y.year = m.year AND y.course_number = m.course_number AND y.section_id = m.section_id "
 					+"and x.year = z.year AND x.course_number = z.course_number AND x.section_id = z.section_id "
 					+"and m.date=x.date and y.quarter = z.quarter and y.year=z.year "
-					+"and c.course_number = m.course_number AND m.type<>'review_session'"
+					+"and c.course_number = m.course_number AND m.type<>'review_session' and d.course_number=z.course_number "
 					+"and ((TO_TIMESTAMP(m.start_time,'HH24:MI')<=TO_TIMESTAMP(x.end_time,'HH24:MI') "
 					+"and TO_TIMESTAMP(m.end_time,'HH24:MI')>=TO_TIMESTAMP(x.start_time,'HH24:MI')) "
 					+"or (TO_TIMESTAMP(x.start_time,'HH24:MI')<=TO_TIMESTAMP(m.end_time,'HH24:MI') "
@@ -94,9 +94,10 @@ if (action != null && action.equals("select_student")) {
 <h2><%= "Conflict courses in current quarter"+cur_student%></h2>
 <TABLE BORDER="1">
 <TR>
-<TH>course_number</TH>
-<TH>course_name</TH>
-<TH>conflict course</TH>
+<TH>course cannot take</TH>
+<TH>name</TH>
+<TH>conflict with</TH>
+<TH>name</TH>
 </TR>
 <% 
 if(conflict_course!=null){
@@ -105,6 +106,7 @@ while(conflict_course.next()){ %>
       <TD><%=conflict_course.getString(1) %></TD>
       <TD><%=conflict_course.getString(2) %></TD>
       <TD><%=conflict_course.getString(3) %></TD>
+      <TD><%=conflict_course.getString(4) %></TD>
       </TR>
 <% }
 }%>
