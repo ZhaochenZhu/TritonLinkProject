@@ -80,8 +80,9 @@ if (action != null && action.equals("select_student")) {
 					+"and ((TO_TIMESTAMP(m.start_time,'HH24:MI')<=TO_TIMESTAMP(x.end_time,'HH24:MI') "
 					+"and TO_TIMESTAMP(m.end_time,'HH24:MI')>=TO_TIMESTAMP(x.start_time,'HH24:MI')) "
 					+"or (TO_TIMESTAMP(x.start_time,'HH24:MI')<=TO_TIMESTAMP(m.end_time,'HH24:MI') "
-					+"and TO_TIMESTAMP(x.end_time,'HH24:MI')<=TO_TIMESTAMP(m.start_time,'HH24:MI')))");
-		pstmt.setInt(1, Integer.parseInt(request.getParameter("student")));
+					+"and TO_TIMESTAMP(x.end_time,'HH24:MI')<=TO_TIMESTAMP(m.start_time,'HH24:MI')))"
+					+"and y.course_number NOT in (select course_number from current_section)");
+		pstmt.setInt(1, Integer.parseInt(request.getParameter("student")));//out.println(pstmt.toString());
 		conflict_course = pstmt.executeQuery();
 		//out.println(pstmt.toString());
 	}
