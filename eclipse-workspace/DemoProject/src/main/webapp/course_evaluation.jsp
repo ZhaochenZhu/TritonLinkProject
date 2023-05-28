@@ -100,12 +100,14 @@ if (action != null && action.equals("quarter_distribution")) {
 					+"select 'D' as grade, SUM(iif(grade like 'D%', 1, 0)) "
 					+"from student_course "
 					+") "
+					+"union( select 'other' as grade, SUM(iif(grade not like 'A%' and grade not like 'B%' "
+					+"and grade not like 'C%' and grade not like 'D%', 1, 0)) from student_course )"
 					+"order by grade asc ");
 			pstmt.setString(1, request.getParameter("professor"));
 			pstmt.setInt(2, Integer.parseInt(request.getParameter("year")));
 			pstmt.setString(3, request.getParameter("quarter"));
 			pstmt.setString(4, request.getParameter("course_number"));
-			
+			//out.println(pstmt.toString());
 			quarter_dis = pstmt.executeQuery();
 		}
 	}
@@ -192,6 +194,8 @@ if (action != null && action.equals("professor_grade_distribution")) {
 				+"select 'D' as grade, SUM(iif(grade like 'D%', 1, 0)) "
 				+"from student_course "
 				+") "
+				+"union( select 'other' as grade, SUM(iif(grade not like 'A%' and grade not like 'B%' "
+				+"and grade not like 'C%' and grade not like 'D%', 1, 0)) from student_course )"
 				+"order by grade asc ");
 		pstmt.setString(1, request.getParameter("professor"));
 		pstmt.setString(2, request.getParameter("course_number"));
@@ -257,6 +261,8 @@ if (action != null && action.equals("grade_distribution")) {
 				+"select 'D' as grade, SUM(iif(grade like 'D%', 1, 0)) "
 				+"from student_course "
 				+") "
+				+"union( select 'other' as grade, SUM(iif(grade not like 'A%' and grade not like 'B%' "
+				+"and grade not like 'C%' and grade not like 'D%', 1, 0)) from student_course )"
 				+"order by grade asc ");
 		pstmt.setString(1, request.getParameter("course_number"));
 		//out.println(pstmt.toString());
