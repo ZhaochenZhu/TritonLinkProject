@@ -87,6 +87,45 @@ if (action != null && action.equals("select_student")) {
 <% 
 out.println(grade_details);
 if(quarters!=null){
+	ResultSet current_class = null;
+	PreparedStatement query_cur_class = connection.prepareStatement(
+			"Select t.course_number, t.section_id, t.unit, s.professor, t.grading_option "
+					+"From enrollment_list_of_class t, section s "
+					+"Where s.course_number = t.course_number "
+					+"AND s.section_id = t.section_id "
+					+"AND s.year = t.year "
+					+"AND t.student_id = ?");
+	query_cur_class.setInt(1, Integer.parseInt(request.getParameter("student")));	
+	//out.println(query_cur_class.toString());
+	current_class = query_cur_class.executeQuery();
+	
+%>	
+<h3>Spring, 2023</h3>
+		<TABLE BORDER="1">
+		<TR>
+		<TH>course_number</TH>
+		<TH>section_id</TH>		
+		<TH>unit</TH>
+		<TH>grade</TH>
+		<TH>preofessor</TH>
+		<TH>grading_option</TH>
+		</TR>
+		<TR>
+		<%
+		if(current_class!=null){
+		while(current_class.next()){ %>
+		<TD><%=current_class.getString(1) %></TD>
+		<TD><%=current_class.getString(2) %></TD>
+		<TD><%=current_class.getInt(3) %></TD>
+		<TD>WIP</TD>
+		<TD><%=current_class.getString(4) %></TD>
+		<TD><%=current_class.getString(5) %></TD>
+		</TR>
+		<%}
+		}%>
+		</TABLE>
+		
+<%	
 while(quarters.next()){ 
 	String current_quarter = quarters.getString(1);
 	
