@@ -54,19 +54,18 @@ if (action != null && action.equals("update")) {
 	// UPDATE the student attributes in the Student table.
 	PreparedStatement pstmt = conn.prepareStatement(
 	"UPDATE student_probation SET probation_reason = ? WHERE student_id = ? AND probation_year = ? AND probation_quarter = ?");	
-	pstmt.setString(1, request.getParameter("probation_reasone"));
+	pstmt.setString(1, request.getParameter("probation_reason"));
 	pstmt.setInt(2, Integer.parseInt(request.getParameter("student_id")));
 	pstmt.setInt(3,Integer.parseInt(request.getParameter("probation_year")));
-    pstmt.setString(5, request.getParameter("probation_quarter"));
+    pstmt.setString(4, request.getParameter("probation_quarter"));
 	
-	// out.println(pstmt.toString());
-	// System.out.println(pstmt.toString());
+	//out.println(pstmt.toString());
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
 	}catch(Exception ex){
-		System.out.println(ex);
+		out.println(ex.getMessage());
 	}
 }
 if (action != null && action.equals("delete")) {
@@ -104,9 +103,9 @@ if (action != null && action.equals("delete")) {
       <TR>
       <form action="student_probation.jsp" method="get">
       <input type="hidden" value="update" name="action">
-      <td><input value="<%= resultset.getInt(1) %>" name="student_id"></td>
-	  <TD><input value="<%= resultset.getInt(2) %>" name="probation_year"> </TD>
-      <td><input value="<%= resultset.getString(3) %>" name="probation_quarter"></td>      
+      <td><input value="<%= resultset.getInt(1) %>" name="student_id" readonly></td>
+	  <TD><input value="<%= resultset.getInt(2) %>" name="probation_year" readonly> </TD>
+      <td><input value="<%= resultset.getString(3) %>" name="probation_quarter" readonly></td>      
       <TD><input value="<%= resultset.getString(4) %>" name="probation_reason"></TD>
       <td><input type="submit" value="Update"></td>
       </form>

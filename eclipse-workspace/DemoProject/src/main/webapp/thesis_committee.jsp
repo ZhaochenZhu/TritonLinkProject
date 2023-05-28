@@ -96,7 +96,7 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-           ResultSet resultset = statement.executeQuery("select * from thesis_committee") ;
+           ResultSet resultset = statement.executeQuery("select * from thesis_committee order by student_id") ;
        %>
       <TABLE BORDER="1">
       <TR>
