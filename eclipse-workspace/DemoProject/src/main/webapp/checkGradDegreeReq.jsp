@@ -144,11 +144,11 @@ if (student_id != null && major != null) {
 		"from master_course_requirement c, courses_taken t " +
 		"where t.student_id = ? AND c.major = ? AND c.course_number = t.course_number " +
 		"group by c.concentration)" +
-		"(select u.concentration, (u.minimum_unit - m.unit) AS unit " +
+		"(select u.concentration, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
 		"from master_concentration_requirement u, met_unit m " +
 		"where u.major = ? AND u.concentration = m.concentration)" +
 		"union " +
-		"(select u.concentration, u.minimum_unit " +
+		"(select u.concentration, IIF(u.minimum_unit < 0, 0.0, u.minimum_unit) " +
 		"from master_concentration_requirement u " +
 		"where u.major = ? AND u.concentration NOT IN (Select concentration from met_unit));"
 	);
@@ -180,6 +180,8 @@ if (student_id != null && major != null) {
 		+"Select m.concentration, g.conc_gpa, u.unit "
 		+"from master_concentration_requirement m, conc_gpa g, met_unit u, grade_conversion c "
 		+"where m.major = ? "
+		+"AND m.concentration = g.concentration "
+		+"AND m.concentration = u.concentration "
 		+"AND c.letter_grade = m.minimum_grade "
 		+"AND m.minimum_unit <= u.unit "
 		+"AND c.number_grade <= g.conc_gpa " 
