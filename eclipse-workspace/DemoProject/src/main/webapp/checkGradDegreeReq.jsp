@@ -221,7 +221,7 @@ if (student_id != null && major != null) {
 		+"select s.course_number, (q.number + s.year * 4) AS quarter_num, s.quarter, s.year, s.section_id "
 		+"from section s, quarter_conversion q "
 		+"where q.quarter = s.quarter)"
-		+"select u.course_number, q.year, q.quarter, q.section_id "
+		+"select DISTINCT u.course_number, q.year, q.quarter "
 		+"from untaken u, quarter_number q " 
 		+"where u.course_number = q.course_number "
 		+"AND q.quarter_num > (2023 *4 + 2) AND NOT EXISTS ( "
@@ -303,7 +303,6 @@ if (concentration_unit != null) {%>
 		<TH>Course Number</TH>
 		<TH>Year</TH>		
 		<TH>Quarter</TH>
-		<TH>Section ID</TH>
 		</TR>
 		
 		<% while(future_courses.next()) { %>
@@ -311,7 +310,6 @@ if (concentration_unit != null) {%>
 			<TD><%= future_courses.getString(1)%></TD>
 			<TD><%= future_courses.getInt(2) %></TD>
 			<TD><%= future_courses.getString(3) %></TD>
-			<TD><%= future_courses.getString(4) %></TD>
 			</TR>
 		<% } %>		
 		
