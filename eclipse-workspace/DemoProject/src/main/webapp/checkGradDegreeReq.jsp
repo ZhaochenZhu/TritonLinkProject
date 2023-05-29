@@ -30,7 +30,7 @@ margin: auto;
 <%
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
-ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Graduate' AND enrolled = 'Yes'") ;
+ResultSet resultset = connection.createStatement().executeQuery("select * from student s, student_period_attendance a where s.current_degree = 'Graduate' AND s.student_id = a.student_id AND a.quarter = 'Spring' AND a.year = 2023 AND a.enrolled = 'Yes' ") ;
 ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Graduate'") ;
 
 %>
@@ -109,46 +109,57 @@ if (action_major != null && action_major.equals("select_major")) {
 
 <%
 if (student_id != null && major != null) {
+	// add past course names
+	
+	
 	// get the remaining total units for grad student for a chosen major
 	PreparedStatement tpstmt = connection.prepareStatement(
 			"With met_unit AS (" + 
 			"(select SUM(t.unit) AS unit " +
-			"from courses_taken t " +
-			"where t.student_id = ? AND t.course_number IN(" +
+			"from courses_taken t, past_names p " +
+			"where t.student_id = ? AND ((t.course_number IN(" +
 			"select course_number from master_course_requirement " +
-			"where major = ?)) " +
+			"where major = ?)) OR ((t.course_number = p.past_names) AND p.course_number IN(" +
+			"select course_number from master_course_requirement " +
+			"where major = ?)"+
+			"))) " +
 			"union " +
 			"(select 0 AS unit " +
 			"from student s " +
 			"where s.student_id = ? AND s.student_id NOT IN(" +
 			"select t.student_id " +
-			"from courses_taken t " +
-			"where t.student_id = ? AND t.course_number IN(" +
+			"from courses_taken t, past_names p " +
+			"where t.student_id = ? AND (t.course_number IN(" +
 			"select course_number from master_course_requirement " +
-			"where major = ?))))" +
-			"select (u.total_unit - m.unit) AS unit " +
+			"where major = ?)) OR (t.course_number = p.past_names AND p.course_number IN(" +
+			"select course_number from master_course_requirement " +
+			"where major = ?)))))" +
+			
+			"select IIF((u.total_unit - m.unit)<0,0.0 ,(u.total_unit - m.unit)) AS unit " +
 			"from total_unit_requirement u, met_unit m " +
 			"where u.type = 'Graduate' AND u.major = ?");
 	tpstmt.setInt(1, student_id);
 	tpstmt.setString(2, major);
-	tpstmt.setInt(3, student_id);
+	tpstmt.setString(3, major);
 	tpstmt.setInt(4, student_id);
-	tpstmt.setString(5, major);
+	tpstmt.setInt(5, student_id);
 	tpstmt.setString(6, major);
+	tpstmt.setString(7, major);
+	tpstmt.setString(8, major);
 	total_unit = tpstmt.executeQuery();
 	
 	// get the remaining units for grad student for all concentration
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
 		"select c.concentration, SUM(t.unit) AS unit " + 
-		"from master_course_requirement c, courses_taken t " +
-		"where t.student_id = ? AND c.major = ? AND c.course_number = t.course_number " +
+		"from master_course_requirement c, courses_taken t, past_names p " +
+		"where t.student_id = ? AND c.major = ? AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " +
 		"group by c.concentration)" +
 		"(select u.concentration, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
 		"from master_concentration_requirement u, met_unit m " +
 		"where u.major = ? AND u.concentration = m.concentration)" +
 		"union " +
-		"(select u.concentration, IIF(u.minimum_unit < 0, 0.0, u.minimum_unit) " +
+		"(select u.concentration, u.minimum_unit AS unit " +
 		"from master_concentration_requirement u " +
 		"where u.major = ? AND u.concentration NOT IN (Select concentration from met_unit));"
 	);
@@ -164,8 +175,8 @@ if (student_id != null && major != null) {
 		"With  conc_gpa AS ( " 
 		+"select CAST(sum(c.unit * g.number_grade)/sum(c.unit) AS DECIMAL(10,2)) as conc_gpa, c.concentration "
 		+"from grade_conversion g, (Select t.course_number, t.unit, t.grade, t.grading_option, m.concentration  "
-			+"From courses_taken t, master_course_requirement m "	
-			+"Where m.course_number = t.course_number  "
+			+"From courses_taken t, master_course_requirement m, past_names p "	
+			+"Where ((m.course_number = t.course_number) OR (p.course_number = m.course_number AND p.past_names = t.course_number))  "
 		  +"AND m.major = ? "
 			+"AND t.student_id = ? ) c "
 		+"where c.grade = g.letter_grade  "
@@ -173,8 +184,8 @@ if (student_id != null && major != null) {
 		
 		+"met_unit AS (" 
 		+"select c.concentration, SUM(t.unit) AS unit "  
-		+"from master_course_requirement c, courses_taken t " 
-		+"where t.student_id = ? AND c.major = ? AND c.course_number = t.course_number " 
+		+"from master_course_requirement c, courses_taken t, past_names p " 
+		+"where t.student_id = ? AND c.major = ? AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " 
 		+"GROUP BY c.concentration) "
 		
 		+"Select m.concentration, g.conc_gpa, u.unit "

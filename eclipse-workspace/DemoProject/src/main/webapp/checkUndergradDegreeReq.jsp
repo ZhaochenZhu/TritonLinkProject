@@ -29,7 +29,7 @@ margin: auto;
 <%
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
-ResultSet resultset = connection.createStatement().executeQuery("select * from student where current_degree = 'Undergraduate' AND enrolled = 'Yes'") ;
+ResultSet resultset = connection.createStatement().executeQuery("select * from student s, student_period_attendance a where s.current_degree = 'Undergraduate' AND s.student_id = a.student_id AND a.quarter = 'Spring' AND a.year = 2023 AND a.enrolled = 'Yes' ") ;
 ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Undergraduate'") ;
 
 %>
@@ -111,44 +111,46 @@ if (student_id != null && major != null) {
 	PreparedStatement tpstmt = connection.prepareStatement(
 			"With met_total_unit AS (" +
 			"(select SUM(t.unit) AS unit " +
-			"from courses_taken t " +
-			"where t.student_id = ? AND t.course_number IN( " +
+			"from courses_taken t, past_names p " +
+			"where t.student_id = ? AND (t.course_number IN( " +
 			"select course_number from general_course_requirement " +
-			"where type = 'Undergraduate' AND major = ?)) " +
+			"where type = 'Undergraduate' AND major = ?)) OR (p.past_names = t.course_number AND p.course_number IN(" +
+			"select course_number from general_course_requirement where type = 'Undergraduate' AND major = ?))) " +
 			"union " +
 			"(select 0 AS unit " +
 			"from student s " +
 			"where s.student_id = ? AND s.student_id NOT IN( " +
 			"select t.student_id " +
-			"from courses_taken t " +
-			"where t.student_id = ? AND t.course_number IN( " +
+			"from courses_taken t, past_names p " +
+			"where t.student_id = ? AND (t.course_number IN( " +
 			"select course_number from general_course_requirement " +
-			"where type = 'Undergraduate' AND major = ?)))" +
-			")" +
+			"where type = 'Undergraduate' AND major = ?) OR (p.past_names = t.course_number AND p.course_number IN(" +
+			"select course_number from general_course_requirement where type = 'Undergraduate' AND major = ?))))))" +
+			
 			"select (u.total_unit - m.unit) AS unit " +
 			"from total_unit_requirement u, met_total_unit m " +
 			"where u.type = 'Undergraduate' AND u.major = ?"	
 	);
 	tpstmt.setInt(1, student_id);
 	tpstmt.setString(2, major);
-	tpstmt.setInt(3, student_id);
+	tpstmt.setString(3, major);
 	tpstmt.setInt(4, student_id);
-	tpstmt.setString(5, major);
+	tpstmt.setInt(5, student_id);
 	tpstmt.setString(6, major);
-	try{	
-		total_unit = tpstmt.executeQuery();
-	}
-	catch(Exception e) {
-		out.println(tpstmt);
-	}
+	tpstmt.setString(7, major);
+	tpstmt.setString(8, major);
+	
+	total_unit = tpstmt.executeQuery();
+	
 	
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
 		"select c.category, SUM(t.unit) AS unit " + 
-		"from general_course_requirement c, courses_taken t " +
-		"where t.student_id = ? AND c.type = 'Undergraduate' AND c.major = ? AND c.course_number = t.course_number " +
+		"from general_course_requirement c, courses_taken t, past_names p " +
+		"where t.student_id = ? AND c.type = 'Undergraduate' AND c.major = ? AND (c.course_number = t.course_number OR "+
+		"(t.course_number = p.past_names AND p.course_number = c.course_number)) " +
 		"group by c.category)" +
-		"(select u.category, (u.minimum_unit - m.unit) AS unit " +
+		"(select u.category, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
 		"from general_unit_requirement u, met_unit m " +
 		"where u.type = 'Undergraduate' AND u.major = ? AND u.category = m.category)" +
 		"union " +
@@ -162,13 +164,9 @@ if (student_id != null && major != null) {
 	pstmt.setString(2, major);
 	pstmt.setString(3, major);
 	pstmt.setString(4, major);
-	try{
-		category_unit = pstmt.executeQuery();
-	}
-	catch (Exception e) {
-		out.println("\n");
-		out.println(pstmt);
-	}
+	
+	category_unit = pstmt.executeQuery();
+	
 	
 }
 
