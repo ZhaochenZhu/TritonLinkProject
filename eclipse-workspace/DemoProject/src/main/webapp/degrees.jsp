@@ -40,6 +40,7 @@ if (action_t != null && action_t.equals("insert_t")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the general_unit_requirement attrs INTO the general_unit_requirement table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO total_unit_requirement VALUES (?, ?, ?)"));
 	pstmt.setString(1, request.getParameter("major"));
@@ -47,6 +48,9 @@ if (action_t != null && action_t.equals("insert_t")) {
 	pstmt.setInt(3, Integer.parseInt(request.getParameter("total_unit")));
 	//out.println(pstmt.toString());
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -150,14 +154,18 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the general_unit_requirement attrs INTO the general_unit_requirement table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO general_unit_requirement VALUES (?, ?, ?, ?, ?)"));
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("type"));
 	pstmt.setString(3, request.getParameter("category"));
 	pstmt.setInt(4, Integer.parseInt(request.getParameter("minimum_unit")));
- pstmt.setString(5, request.getParameter("minimum_grade"));
+ 	pstmt.setString(5, request.getParameter("minimum_grade"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -198,7 +206,7 @@ if (action != null && action.equals("delete")) {
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("type"));
 	pstmt.setString(3, request.getParameter("category"));
- int rowCount = pstmt.executeUpdate();
+ 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -274,6 +282,7 @@ if (action_cr != null && action_cr.equals("insert_cr")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the general_unit_requirement attrs INTO the general_course_requirement table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO general_course_requirement VALUES (?, ?, ?, ?)"));
 	pstmt.setString(1, request.getParameter("major"));
@@ -281,6 +290,9 @@ if (action_cr != null && action_cr.equals("insert_cr")) {
 	pstmt.setString(3, request.getParameter("category"));
 	pstmt.setString(4, request.getParameter("course_number"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();

@@ -94,7 +94,7 @@ if(quarters!=null){
 					+"Where s.course_number = t.course_number "
 					+"AND s.section_id = t.section_id "
 					+"AND s.year = t.year "
-					+"AND t.student_id = ?");
+					+"AND t.student_id = ? order by t.course_number");
 	query_cur_class.setInt(1, Integer.parseInt(request.getParameter("student")));	
 	//out.println(query_cur_class.toString());
 	current_class = query_cur_class.executeQuery();
@@ -107,7 +107,7 @@ if(quarters!=null){
 		<TH>section_id</TH>		
 		<TH>unit</TH>
 		<TH>grade</TH>
-		<TH>preofessor</TH>
+		<TH>professor</TH>
 		<TH>grading_option</TH>
 		</TR>
 		<TR>
@@ -160,7 +160,7 @@ while(quarters.next()){
 			+"AND s.section_id = t.section_id "
 			+"AND s.year = t.year "
 			+"AND s.year = ? "
-			+"AND t.student_id = ?");
+			+"AND t.student_id = ? order by t.course_number");
 	query_class.setString(1, current_quarter);
 	query_class.setInt(2, year);
 	query_class.setInt(3, Integer.parseInt(request.getParameter("student")));
@@ -177,7 +177,7 @@ while(quarters.next()){
 		<TH>section_id</TH>		
 		<TH>unit</TH>
 		<TH>grade</TH>
-		<TH>preofessor</TH>
+		<TH>professor</TH>
 		<TH>grading_option</TH>
 		</TR>
 		<TR>

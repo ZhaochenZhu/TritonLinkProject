@@ -54,7 +54,6 @@ Course number: <input type="text" name="course_number"/>
 		"SELECT * From section WHERE course_number = ? AND year = 2023 AND quarter ='Spring'");
 	pstmt.setString(1, request.getParameter("course_number"));
 	ResultSet section = pstmt.executeQuery();
-	//int student_id = -1;
 %>
 <TABLE BORDER="1">
       <TR>
@@ -122,9 +121,6 @@ if (action != null && (action.equals("sign_in")||action.equals("enroll_class")||
 }
      
 if (action != null && (action.equals("check_prereq"))) {
-	//conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Student table.
 	pstmt = connection.prepareStatement(
 	("SELECT * FROM prerequisite WHERE course_number = ?"));
 	pstmt.setString(1,request.getParameter("course_number"));
@@ -135,9 +131,6 @@ if (action != null && action.equals("drop_course")) {
 	
 	try{
 	connection.setAutoCommit(false);
-	//conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Student table.
 	pstmt = connection.prepareStatement(
 	("Delete FROM enrollment_list_of_class WHERE year = ? AND section_id = ? AND course_number = ? AND student_id = ?"));
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("year")));
@@ -151,19 +144,11 @@ if (action != null && action.equals("drop_course")) {
 	}catch(Exception ex){
 		out.println(ex);
 	}
-	/* out.println("Drop course");
-	out.println(request.getParameter("section_id"));
-	out.println(request.getParameter("course_number"));
-	out.println(request.getParameter("student_id")); */
 }
 
 if (action != null && action.equals("change_grading")) {
 	try{
 		connection.setAutoCommit(false);
-	//conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Student table.
-	
 	pstmt = connection.prepareStatement("SELECT grading_option, units FROM section WHERE year = ? AND section_id = ? AND course_number = ?");
 	pstmt.setInt(1,2023);
 	pstmt.setString(2,request.getParameter("section_id"));
@@ -215,10 +200,7 @@ if (action != null && action.equals("change_grading")) {
 
 if (action != null && action.equals("enroll_class")) {
 	try{
-		connection.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Student table.
-	
+		connection.setAutoCommit(false);	
 	// check for prereq
 	Statement stmt = connection.createStatement() ;
 	String query = "select * from prerequisite WHERE course_number = '"+
@@ -253,6 +235,7 @@ if (action != null && action.equals("enroll_class")) {
 	}
 	if(pre_reqs.isEmpty() && has_grading_option){
 		// can enroll in course
+		try{
 		pstmt = connection.prepareStatement(
 		("INSERT INTO enrollment_list_of_class VALUES (?, ?, ?, ?, ?, ?)"));
 		pstmt.setInt(1,2023);
@@ -262,6 +245,9 @@ if (action != null && action.equals("enroll_class")) {
 		pstmt.setString(5,request.getParameter("grading_option"));
 		pstmt.setInt(6,Integer.parseInt(request.getParameter("units")));
 		pstmt.executeUpdate();
+		}catch(Exception e){
+			out.println(e.getMessage());
+		}
 		connection.commit();
 		out.println("Enrolled");
 	}
@@ -305,7 +291,7 @@ if (action != null && action.equals("enroll_class")) {
 	<TABLE BORDER="1">
 	<%
       pstmt = connection.prepareStatement(
-    			("SELECT * FROM enrollment_list_of_class WHERE student_id = ?"));
+    			("SELECT * FROM enrollment_list_of_class WHERE student_id = ? order by course_number"));
       ResultSet enrolled_course;
       if(action!=null && !request.getParameter("student_id").equals("")){
     	  pstmt.setInt(1,Integer.parseInt(request.getParameter("student_id")));    	  

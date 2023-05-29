@@ -48,11 +48,15 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO faculty VALUES (?, ?)"));
 	pstmt.setString(1,request.getParameter("faculty_name"));
 	pstmt.setString(2, request.getParameter("title"));
 	pstmt.executeUpdate();
+	}catch(Exception ex){
+		out.println(ex.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -87,13 +91,15 @@ if (action != null && action.equals("delete")) {
 if (action != null && action.equals("insert_dpt")) {
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
-	// Create the prepared statement and use it to
-	// INSERT the student attrs INTO the Student table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO faculty_department VALUES (?, ?)"));
 	pstmt.setString(1,request.getParameter("faculty_name"));
 	pstmt.setString(2, request.getParameter("department"));
 	pstmt.executeUpdate();
+	}catch(Exception ex){
+		out.println(ex.getMessage());		
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -159,7 +165,7 @@ if (action != null && action.equals("delete_dpt")) {
        <%
            connection = ConnectionProvider.getCon();
            Statement statement_dpt = connection.createStatement() ;
-          ResultSet resultset_dpt = statement_dpt.executeQuery("select * from faculty_department") ;
+          ResultSet resultset_dpt = statement_dpt.executeQuery("select * from faculty_department ") ;
        %>
       <TABLE BORDER="1">
       <TR>

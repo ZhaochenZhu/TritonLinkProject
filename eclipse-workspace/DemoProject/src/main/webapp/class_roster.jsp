@@ -75,7 +75,7 @@ if (action != null && action.equals("select_class")) {
 							+"from enrollment_list_of_class e, student s, course_info i "
 							+"Where e.student_id = s.student_id "
 							+"AND e.course_number = i.course_number "
-							+"AND i.course_name = ? ");
+							+"AND i.course_name = ? order by student_id");
 			
 			pstmt.setString(1, request.getParameter("course_name"));
 			roster_course = pstmt.executeQuery();
@@ -86,7 +86,7 @@ if (action != null && action.equals("select_class")) {
 						+"Where c.student_id = s.student_id "
 						+"AND c.course_number = i.course_number "
 						+"AND i.course_name = ? "
-						+"AND year = ? ");
+						+"AND year = ? order by student_id");
 			pstmt.setString(1, request.getParameter("course_name"));
 			pstmt.setInt(2, Integer.parseInt(request.getParameter("year")));
 			roster_course = pstmt.executeQuery();

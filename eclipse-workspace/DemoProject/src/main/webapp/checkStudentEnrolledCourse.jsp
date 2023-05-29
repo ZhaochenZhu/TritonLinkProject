@@ -73,7 +73,7 @@ if (action != null && action.equals("select_student")) {
 					+"AND e.year = 2023 "
 					+"and e.course_number = s.course_number "
 					+"AND e.section_id = s.section_id "
-					+"AND s.quarter = 'Spring'");
+					+"AND s.quarter = 'Spring' order by course_number");
 		pstmt.setInt(1, Integer.parseInt(request.getParameter("student")));
 		student_course = pstmt.executeQuery();
 	}

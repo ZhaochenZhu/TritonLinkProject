@@ -54,6 +54,7 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO section VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("year")));
@@ -66,6 +67,9 @@ if (action != null && action.equals("insert")) {
 	pstmt.setString(8, request.getParameter("professor"));
 	pstmt.setString(9, request.getParameter("grading_option"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -119,7 +123,7 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-           ResultSet resultset = statement.executeQuery("select * from section") ;
+           ResultSet resultset = statement.executeQuery("select * from section order by course_number") ;
        %>
       <TABLE BORDER="1">
       <TR>
@@ -187,6 +191,7 @@ if (actionMeeting != null && actionMeeting.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Student table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO class_meetings_times VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("year")));
@@ -198,6 +203,9 @@ if (actionMeeting != null && actionMeeting.equals("insert")) {
 	pstmt.setString(7, request.getParameter("start_time"));
 	pstmt.setString(8, request.getParameter("end_time"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -255,7 +263,7 @@ if (actionMeeting != null && actionMeeting.equals("delete")) {
        <%
            Connection connectionMeeting = ConnectionProvider.getCon();
            Statement statementMeeting = connection.createStatement() ;
-           ResultSet resultsetMeeting = statement.executeQuery("select * from class_meetings_times") ;
+           ResultSet resultsetMeeting = statement.executeQuery("select * from class_meetings_times order by course_number") ;
        %>
       <TABLE BORDER="1">
       <TR>

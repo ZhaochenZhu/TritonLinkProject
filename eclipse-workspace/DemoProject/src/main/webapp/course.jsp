@@ -49,6 +49,7 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Course table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO course_info VALUES (?, ?, ?, ?)"));
 	pstmt.setString(1, request.getParameter("course_number"));
@@ -56,6 +57,9 @@ if (action != null && action.equals("insert")) {
 	pstmt.setString(3, request.getParameter("department"));
 	pstmt.setString(4, request.getParameter("lab_requirement"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -66,11 +70,15 @@ if (action != null && action.equals("insert_pre_req")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Course table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO prerequisite  VALUES (?, ?)"));
 	pstmt.setString(1, request.getParameter("course_number"));
 	pstmt.setString(2, request.getParameter("prereq_number"));
 	pstmt.executeUpdate();
+	}catch(Exception e){
+		out.println(e.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
@@ -118,7 +126,7 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-           ResultSet resultset = statement.executeQuery("select * from course_info") ;
+           ResultSet resultset = statement.executeQuery("select * from course_info order by course_number") ;
        %>
       <TABLE BORDER="1">
       <TR>

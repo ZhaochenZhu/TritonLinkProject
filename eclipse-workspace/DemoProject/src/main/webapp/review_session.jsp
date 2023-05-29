@@ -40,6 +40,7 @@ if (action != null && action.equals("insert")) {
  conn.setAutoCommit(false);
  // Create the prepared statement and use it to
  // INSERT the review session attrs INTO the class_meetings_time table.
+ try{
  PreparedStatement pstmt = conn.prepareStatement(
  ("INSERT INTO class_meetings_times VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
  pstmt.setInt(1, Integer.parseInt(request.getParameter("year")));
@@ -51,6 +52,9 @@ if (action != null && action.equals("insert")) {
     pstmt.setString(7, request.getParameter("start_time"));
     pstmt.setString(8, request.getParameter("end_time"));
  pstmt.executeUpdate();
+ }catch(Exception e){
+	 out.println(e.getMessage());
+ }
  conn.commit();
  conn.setAutoCommit(true);
  conn.close();
@@ -100,7 +104,7 @@ if (action != null && action.equals("delete")) {
        <%
            Connection connection = ConnectionProvider.getCon();
            Statement statement = connection.createStatement() ;
-          ResultSet resultset = statement.executeQuery("select * from class_meetings_times WHERE type = 'review_session'") ;
+          ResultSet resultset = statement.executeQuery("select * from class_meetings_times WHERE type = 'review_session' order by course_number") ;
        %>
       <TABLE BORDER="1">
       <TR>
