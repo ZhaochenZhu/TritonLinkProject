@@ -297,7 +297,6 @@ if (action != null && action.equals("delete")) {
       <TH>last_name</TH>
       <TH>middle_name</TH>
       <TH>ssn</TH>
-      <TH>enrolled</TH>
       <TH>residential_status</TH>
       <TH>current_degree</TH>
       </TR>
