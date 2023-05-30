@@ -26,7 +26,8 @@ Type:
 <%--<input type="text" name="type" size="5"/> --%>
 <select name="type" id="type">
   <option value="">Select One</option>
-  <option value="Undergraduate">Undergraduate</option>
+  <option value="Bachelor of Science">Bachelor of Science</option>
+  <option value="Bachelor of Arts">Bachelor of Arts</option>
   <option value="Graduate">Master</option>
 </select>
 Total unit: <input type="text" name="total_unit" size="5"/>
@@ -129,7 +130,7 @@ if (action_t != null && action_t.equals("delete_t")) {
  <br><br>
 
 
-<H2>Adding Degree Category Unit Requirement</H2>
+<H2>Adding Undergraduate Degree Category Unit Requirement</H2>
 <form name = "f1" method="get">
 <input type="hidden" value="insert" name="action">
 Major: <input type="text" name="major" size="5"/>
@@ -137,8 +138,8 @@ Type:
 <%--<input type="text" name="type" size="5"/> --%>
 <select name="type" id="type">
   <option value="">Select One</option>
-  <option value="Undergraduate">Undergraduate</option>
-  <option value="Graduate">Master</option>
+  <option value="Bachelor of Science">Bachelor of Science</option>
+  <option value="Bachelor of Science">Bachelor of Arts</option>
 </select>
 Category: <input type="text" name="category" size="5"/>
 Minimum unit: <input type="text" name="minimum_unit" size="2"/>
@@ -215,7 +216,7 @@ if (action != null && action.equals("delete")) {
 
 
 
-<H2>Current Degrees</H2>
+<H2>Current Undergraduate Degrees</H2>
  <%
  Statement statement = connection.createStatement() ;
  ResultSet resultset = statement.executeQuery("select * from general_unit_requirement") ;
@@ -257,7 +258,7 @@ if (action != null && action.equals("delete")) {
 
  
 
-<H2>Adding Degree Course requirements</H2>
+<H2>Adding Undergraduate Degree Course Category requirements</H2>
 <form name = "f1" method="get">
 <input type="hidden" value="insert_cr" name="action_cr">
 Major: <input type="text" name="major" size="5"/>
@@ -265,8 +266,8 @@ Type:
 <%--<input type="text" name="type" size="5"/> --%>
 <select name="type" id="type">
   <option value="">Select One</option>
-  <option value="Undergraduate">Undergraduate</option>
-  <option value="Graduate">Graduate</option>
+  <option value="Bachelor of Science">Bachelor of Science</option>
+  <option value="Bachelor of Science">Bachelor of Arts</option>
 </select>
 Category: <input type="text" name="category" size="5"/>
 Course Number: <input type="text" name="course_number" size="10"/>
@@ -323,7 +324,7 @@ if (action_cr != null && action_cr.equals("delete_cr")) {
 
 
 
-<H2>Current Degree Course requirements</H2>
+<H2>Current Undergraduate Degree Course Category Requirements</H2>
 <%
  Connection conn_cr = ConnectionProvider.getCon();
  Statement statement_cr = conn_cr.createStatement() ;
@@ -389,11 +390,12 @@ if (action_mc != null && action_mc.equals("insert_mc")) {
 	// Create the prepared statement and use it to
 	// INSERT the general_unit_requirement attrs INTO the master_concentration_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO master_concentration_requirement VALUES (?, ?, ?, ?)"));
+	("INSERT INTO master_concentration_requirement VALUES (?, ?, ?, ?, ?)"));
 	pstmt.setString(1, request.getParameter("major"));
-	pstmt.setString(2, request.getParameter("concentration"));
-	pstmt.setInt(3, Integer.parseInt(request.getParameter("minimum_unit")));
- 	pstmt.setFloat(4, Float.parseFloat(request.getParameter("minimum_grade")));
+	pstmt.setString(2, "Graduate");
+	pstmt.setString(3, request.getParameter("concentration"));
+	pstmt.setInt(4, Integer.parseInt(request.getParameter("minimum_unit")));
+ 	pstmt.setFloat(5, Float.parseFloat(request.getParameter("minimum_grade")));
 	pstmt.executeUpdate();
 
 	conn.close();
@@ -406,7 +408,7 @@ if (action_mc != null && action_mc.equals("update_mc")) {
 	// Create the prepared statement and use it to
 	// UPDATE the general_unit_requirement attributes in the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE master_concentration_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND concentration = ?");	
+	"UPDATE master_concentration_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND concentration = ? AND type = 'Graduate'");	
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
  	pstmt.setFloat(2, Float.parseFloat(request.getParameter("minimum_grade")));
 	pstmt.setString(3, request.getParameter("major"));	
@@ -428,7 +430,7 @@ if (action_mc != null && action_mc.equals("delete_mc")) {
 	// Create the prepared statement and use it to
 	// DELETE the general_unit_requirement FROM the general_unit_requirement table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"DELETE FROM master_concentration_requirement WHERE major = ? AND concentration = ?");
+	"DELETE FROM master_concentration_requirement WHERE major = ? AND concentration = ? AND type = 'Graduate'");
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("concentration"));
  int rowCount = pstmt.executeUpdate();
@@ -458,15 +460,15 @@ if (action_mc != null && action_mc.equals("delete_mc")) {
  <form action="degrees.jsp" method="get">
  <input type="hidden" value="update_mc" name="action_mc">
  <td><input value="<%= resultset_mc.getString(1) %>" name="major"></td> 
- <TD><input value="<%= resultset_mc.getString(2) %>" name="concentration" ></TD>
- <TD><input value="<%= resultset_mc.getInt(3) %>" name="minimum_unit"> </TD>
- <TD><input value="<%= resultset_mc.getFloat(4) %>" name="minimum_grade"></TD>
+ <TD><input value="<%= resultset_mc.getString(3) %>" name="concentration" ></TD>
+ <TD><input value="<%= resultset_mc.getInt(4) %>" name="minimum_unit"> </TD>
+ <TD><input value="<%= resultset_mc.getFloat(5) %>" name="minimum_grade"></TD>
  <td><input type="submit" value="Update"></td>
  </form>
  <form action="degrees.jsp" method="get">
 	<input type="hidden" value="delete_mc" name="action_mc">
 	<input type="hidden" value="<%= resultset_mc.getString(1) %>" name="major"> 
- 	<input type="hidden" value="<%= resultset_mc.getString(2) %>" name="concentration">
+ 	<input type="hidden" value="<%= resultset_mc.getString(3) %>" name="concentration">
  <TD><input type="submit" value="Delete"></TD>
 	</form>
  </TR>

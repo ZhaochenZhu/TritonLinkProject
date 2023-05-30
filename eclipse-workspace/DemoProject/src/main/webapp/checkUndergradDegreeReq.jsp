@@ -30,7 +30,7 @@ margin: auto;
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
 ResultSet resultset = connection.createStatement().executeQuery("select * from student s, student_period_attendance a where s.current_degree = 'Undergraduate' AND s.student_id = a.student_id AND a.quarter = 'Spring' AND a.year = 2023 AND a.enrolled = 'Yes' ") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Undergraduate'") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Bachelor of Science' OR type = 'Bachelor of Arts'") ;
 
 %>
 
@@ -46,12 +46,12 @@ ResultSet degreeResultset = connection.createStatement().executeQuery("select * 
 </select>
 <br><br>
 <input type="hidden" value="select_major" name="action_major">
-<label for="major">Choose a major:</label>
+<label for="major">Choose a major and degree type:</label>
 <select name="major" id="major">
   <option value="">Select one from below</option>
 	<%while(degreeResultset.next()){  %>
   <%-- <option value="<%=resultset.getInt(1) %>"><%=resultset.getString(2)+ " "+ resultset.getString(3) %></option>--%>
-  <option value="<%=degreeResultset.getString(1) %>"><%=degreeResultset.getString(1) %></option>
+  <option value="<%=degreeResultset.getString(1) +","+ degreeResultset.getString(2) %>"><%=degreeResultset.getString(1) +", "+ degreeResultset.getString(2) %></option>
       <% } %>
 </select>
 <input type="submit" value="Select">
@@ -73,6 +73,7 @@ ResultSet category_unit = null;
 String action_student = request.getParameter("action_student");
 String action_major = request.getParameter("action_major");
 String major = null;
+String degree_type = null;
 
 Integer student_id = null;
 String student_name = null;
@@ -100,22 +101,25 @@ if (action_major != null && action_major.equals("select_major")) {
 	if(request.getParameter("major").equals("")){
 		out.println("Please select a major");
 	} else {
-		major = request.getParameter("major");
-		out.println(major);
+		String[] arr_curr_str = request.getParameter("major").split(",");
+		
+		major = arr_curr_str[0];
+		degree_type = arr_curr_str[1];
+		out.println(degree_type+" in "+major);
 	}
 }
 %>
 
 <%
-if (student_id != null && major != null) {
+if (student_id != null && major != null && degree_type != null) {
 	PreparedStatement tpstmt = connection.prepareStatement(
 			"With met_total_unit AS (" +
 			"(select SUM(t.unit) AS unit " +
 			"from courses_taken t, past_names p " +
 			"where t.student_id = ? AND (t.course_number IN( " +
 			"select course_number from general_course_requirement " +
-			"where type = 'Undergraduate' AND major = ?)) OR (p.past_names = t.course_number AND p.course_number IN(" +
-			"select course_number from general_course_requirement where type = 'Undergraduate' AND major = ?))) " +
+			"where type = ? AND major = ?)) OR (p.past_names = t.course_number AND p.course_number IN(" +
+			"select course_number from general_course_requirement where type = ? AND major = ?))) " +
 			"union " +
 			"(select 0 AS unit " +
 			"from student s " +
@@ -124,21 +128,26 @@ if (student_id != null && major != null) {
 			"from courses_taken t, past_names p " +
 			"where t.student_id = ? AND (t.course_number IN( " +
 			"select course_number from general_course_requirement " +
-			"where type = 'Undergraduate' AND major = ?) OR (p.past_names = t.course_number AND p.course_number IN(" +
-			"select course_number from general_course_requirement where type = 'Undergraduate' AND major = ?))))))" +
+			"where type = ? AND major = ?) OR (p.past_names = t.course_number AND p.course_number IN(" +
+			"select course_number from general_course_requirement where type = ? AND major = ?))))))" +
 			
-			"select (u.total_unit - m.unit) AS unit " +
+			"select IIF((u.total_unit - m.unit) < 0, 0, (u.total_unit - m.unit)) AS unit " +
 			"from total_unit_requirement u, met_total_unit m " +
-			"where u.type = 'Undergraduate' AND u.major = ?"	
+			"where u.type = ? AND u.major = ?"	
 	);
 	tpstmt.setInt(1, student_id);
-	tpstmt.setString(2, major);
+	tpstmt.setString(2, degree_type);
 	tpstmt.setString(3, major);
-	tpstmt.setInt(4, student_id);
-	tpstmt.setInt(5, student_id);
-	tpstmt.setString(6, major);
-	tpstmt.setString(7, major);
-	tpstmt.setString(8, major);
+	tpstmt.setString(4, degree_type);
+	tpstmt.setString(5, major);
+	tpstmt.setInt(6, student_id);
+	tpstmt.setInt(7, student_id);
+	tpstmt.setString(8, degree_type);
+	tpstmt.setString(9, major);
+	tpstmt.setString(10, degree_type);
+	tpstmt.setString(11, major);
+	tpstmt.setString(12, degree_type);
+	tpstmt.setString(13, major);
 	
 	total_unit = tpstmt.executeQuery();
 	
@@ -147,23 +156,26 @@ if (student_id != null && major != null) {
 		"With met_unit AS (" +
 		"select c.category, SUM(t.unit) AS unit " + 
 		"from general_course_requirement c, courses_taken t, past_names p " +
-		"where t.student_id = ? AND c.type = 'Undergraduate' AND c.major = ? AND (c.course_number = t.course_number OR "+
+		"where t.student_id = ? AND c.type = ? AND c.major = ? AND (c.course_number = t.course_number OR "+
 		"(t.course_number = p.past_names AND p.course_number = c.course_number)) " +
 		"group by c.category)" +
 		"(select u.category, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
 		"from general_unit_requirement u, met_unit m " +
-		"where u.type = 'Undergraduate' AND u.major = ? AND u.category = m.category)" +
+		"where u.type = ? AND u.major = ? AND u.category = m.category)" +
 		"union " +
 		"(select u.category, u.minimum_unit " +
 		"from general_unit_requirement u " +
-		"where u.type = 'Undergraduate' AND u.major = ? AND u.category NOT IN (Select category from met_unit));"
+		"where u.type = ? AND u.major = ? AND u.category NOT IN (Select category from met_unit));"
 		
 			
 	);
 	pstmt.setInt(1, student_id);
-	pstmt.setString(2, major);
+	pstmt.setString(2, degree_type);
 	pstmt.setString(3, major);
-	pstmt.setString(4, major);
+	pstmt.setString(4, degree_type);
+	pstmt.setString(5, major);
+	pstmt.setString(6, degree_type);
+	pstmt.setString(7, major);
 	
 	category_unit = pstmt.executeQuery();
 	
@@ -174,7 +186,7 @@ if (student_id != null && major != null) {
 
 <% 
 if (total_unit != null && category_unit != null) {
-	%><h2><%= "BSC in " + major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
+	%><h2><%= degree_type + " in " + major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
 	<TABLE BORDER = "1">
 	<TR>
 	<TH>remaining total_unit</TH>
