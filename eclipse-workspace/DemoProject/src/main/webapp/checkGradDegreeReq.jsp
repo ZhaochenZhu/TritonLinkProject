@@ -244,7 +244,7 @@ if (student_id != null && major != null) {
 
 <% 
 if (total_unit != null ) {
-	%><h2><%= major + " Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
+	%><h2><%= "MS in " + major + ", Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
 	<TABLE BORDER = "1">
 	<TR>
 	<TH>remaining total_unit</TH>
