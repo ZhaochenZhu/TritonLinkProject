@@ -161,7 +161,7 @@ if (action != null && action.equals("insert")) {
 	pstmt.setString(2, request.getParameter("type"));
 	pstmt.setString(3, request.getParameter("category"));
 	pstmt.setInt(4, Integer.parseInt(request.getParameter("minimum_unit")));
- 	pstmt.setString(5, request.getParameter("minimum_grade"));
+ 	pstmt.setFloat(5, Float.parseFloat(request.getParameter("minimum_grade")));
 	pstmt.executeUpdate();
 	}catch(Exception e){
 		out.println(e.getMessage());
@@ -180,9 +180,9 @@ if (action != null && action.equals("update")) {
 	PreparedStatement pstmt = conn.prepareStatement(
 	"UPDATE general_unit_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND type = ? AND category = ?");	
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
- pstmt.setString(2, request.getParameter("minimum_grade"));
+ 	pstmt.setFloat(2, Float.parseFloat(request.getParameter("minimum_grade")));
 	pstmt.setString(3, request.getParameter("major"));	
- pstmt.setString(4, request.getParameter("type"));
+ 	pstmt.setString(4, request.getParameter("type"));
 	pstmt.setString(5, request.getParameter("category"));	
 
 	// out.println(pstmt.toString());
@@ -238,7 +238,7 @@ if (action != null && action.equals("delete")) {
  <TD><input value="<%= resultset.getString(2) %>" name="type" ></TD>
  <TD><input value="<%= resultset.getString(3) %>" name="category"></TD>
  <TD><input value="<%= resultset.getInt(4) %>" name="minimum_unit"> </TD>
- <TD><input value="<%= resultset.getString(5) %>" name="minimum_grade"></TD>
+ <TD><input value="<%= resultset.getFloat(5) %>" name="minimum_grade"></TD>
  <td><input type="submit" value="Update"></td>
  </form>
 
@@ -393,7 +393,7 @@ if (action_mc != null && action_mc.equals("insert_mc")) {
 	pstmt.setString(1, request.getParameter("major"));
 	pstmt.setString(2, request.getParameter("concentration"));
 	pstmt.setInt(3, Integer.parseInt(request.getParameter("minimum_unit")));
- 	pstmt.setString(4, request.getParameter("minimum_grade"));
+ 	pstmt.setFloat(4, Float.parseFloat(request.getParameter("minimum_grade")));
 	pstmt.executeUpdate();
 
 	conn.close();
@@ -408,7 +408,7 @@ if (action_mc != null && action_mc.equals("update_mc")) {
 	PreparedStatement pstmt = conn.prepareStatement(
 	"UPDATE master_concentration_requirement SET minimum_unit = ?, minimum_grade = ? WHERE major = ? AND concentration = ?");	
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("minimum_unit")));
- 	pstmt.setString(2, request.getParameter("minimum_grade"));
+ 	pstmt.setFloat(2, Float.parseFloat(request.getParameter("minimum_grade")));
 	pstmt.setString(3, request.getParameter("major"));	
 	pstmt.setString(4, request.getParameter("concentration"));
 
@@ -460,7 +460,7 @@ if (action_mc != null && action_mc.equals("delete_mc")) {
  <td><input value="<%= resultset_mc.getString(1) %>" name="major"></td> 
  <TD><input value="<%= resultset_mc.getString(2) %>" name="concentration" ></TD>
  <TD><input value="<%= resultset_mc.getInt(3) %>" name="minimum_unit"> </TD>
- <TD><input value="<%= resultset_mc.getString(4) %>" name="minimum_grade"></TD>
+ <TD><input value="<%= resultset_mc.getFloat(4) %>" name="minimum_grade"></TD>
  <td><input type="submit" value="Update"></td>
  </form>
  <form action="degrees.jsp" method="get">

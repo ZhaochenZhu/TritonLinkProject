@@ -135,7 +135,7 @@ if (student_id != null && major != null) {
 			"select course_number from master_course_requirement " +
 			"where major = ?)))))" +
 			
-			"select IIF((u.total_unit - m.unit)<0,0.0 ,(u.total_unit - m.unit)) AS unit " +
+			"select DISTINCT IIF((u.total_unit - m.unit)<0,0.0 ,(u.total_unit - m.unit)) AS unit " +
 			"from total_unit_requirement u, met_unit m " +
 			"where u.type = 'Graduate' AND u.major = ?");
 	tpstmt.setInt(1, student_id);
@@ -155,11 +155,11 @@ if (student_id != null && major != null) {
 		"from master_course_requirement c, courses_taken t, past_names p " +
 		"where t.student_id = ? AND c.major = ? AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " +
 		"group by c.concentration)" +
-		"(select u.concentration, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
+		"(select DISTINCT u.concentration, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
 		"from master_concentration_requirement u, met_unit m " +
 		"where u.major = ? AND u.concentration = m.concentration)" +
 		"union " +
-		"(select u.concentration, u.minimum_unit AS unit " +
+		"(select DISTINCT u.concentration, u.minimum_unit AS unit " +
 		"from master_concentration_requirement u " +
 		"where u.major = ? AND u.concentration NOT IN (Select concentration from met_unit));"
 	);
@@ -188,14 +188,14 @@ if (student_id != null && major != null) {
 		+"where t.student_id = ? AND c.major = ? AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " 
 		+"GROUP BY c.concentration) "
 		
-		+"Select m.concentration, g.conc_gpa, u.unit "
+		+"Select DISTINCT m.concentration, g.conc_gpa, u.unit "
 		+"from master_concentration_requirement m, conc_gpa g, met_unit u, grade_conversion c "
 		+"where m.major = ? "
 		+"AND m.concentration = g.concentration "
 		+"AND m.concentration = u.concentration "
-		+"AND c.letter_grade = m.minimum_grade "
+		/* +"AND c.letter_grade = m.minimum_grade " */
 		+"AND m.minimum_unit <= u.unit "
-		+"AND c.number_grade <= g.conc_gpa " 
+		+"AND m.minimum_grade <= g.conc_gpa " 
 	);
 	met_concentration.setString(1, major);
 	met_concentration.setInt(2, student_id);
