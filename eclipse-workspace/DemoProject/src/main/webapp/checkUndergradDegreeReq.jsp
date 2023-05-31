@@ -30,7 +30,7 @@ margin: auto;
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
 ResultSet resultset = connection.createStatement().executeQuery("select * from student s, student_period_attendance a where s.current_degree = 'Undergraduate' AND s.student_id = a.student_id AND a.quarter = 'Spring' AND a.year = 2023 AND a.enrolled = 'Yes' ") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Bachelor of Science' OR type = 'Bachelor of Arts'") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where degree_type = 'Bachelor of Science' OR degree_type = 'Bachelor of Arts'") ;
 
 %>
 
