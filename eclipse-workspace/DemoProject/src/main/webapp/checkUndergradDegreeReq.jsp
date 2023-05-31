@@ -30,7 +30,7 @@ margin: auto;
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
 ResultSet resultset = connection.createStatement().executeQuery("select * from student s, student_period_attendance a where s.current_degree = 'Undergraduate' AND s.student_id = a.student_id AND a.quarter = 'Spring' AND a.year = 2023 AND a.enrolled = 'Yes' ") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Bachelor of Science' OR type = 'Bachelor of Arts'") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where degree_type LIKE 'Bachelor%' AND degree_focus = 'major'") ;
 
 %>
 
@@ -117,9 +117,9 @@ if (student_id != null && major != null && degree_type != null) {
 			"(select SUM(t.unit) AS unit " +
 			"from courses_taken t, past_names p " +
 			"where t.student_id = ? AND (t.course_number IN( " +
-			"select course_number from general_course_requirement " +
-			"where type = ? AND major = ?)) OR (p.past_names = t.course_number AND p.course_number IN(" +
-			"select course_number from general_course_requirement where type = ? AND major = ?))) " +
+			"select course_number from undergrad_course_requirement " +
+			"where degree_type = ? AND discipline = ? AND degree_focus = 'major')) OR (p.past_names = t.course_number AND p.course_number IN(" +
+			"select course_number from undergrad_course_requirement where degree_type = ? AND discipline = ? AND degree_focus = 'major'))) " +
 			"union " +
 			"(select 0 AS unit " +
 			"from student s " +
@@ -127,13 +127,13 @@ if (student_id != null && major != null && degree_type != null) {
 			"select t.student_id " +
 			"from courses_taken t, past_names p " +
 			"where t.student_id = ? AND (t.course_number IN( " +
-			"select course_number from general_course_requirement " +
-			"where type = ? AND major = ?) OR (p.past_names = t.course_number AND p.course_number IN(" +
-			"select course_number from general_course_requirement where type = ? AND major = ?))))))" +
+			"select course_number from undergrad_course_requirement " +
+			"where degree_type = ? AND discipline = ? AND degree_focus = 'major') OR (p.past_names = t.course_number AND p.course_number IN(" +
+			"select course_number from undergrad_course_requirement where degree_type = ? AND discipline = ? AND degree_focus = 'major'))))))" +
 			
 			"select IIF((u.total_unit - m.unit) < 0, 0, (u.total_unit - m.unit)) AS unit " +
 			"from total_unit_requirement u, met_total_unit m " +
-			"where u.type = ? AND u.major = ?"	
+			"where u.degree_type = ? AND u.discipline = ? AND u.degree_focus = 'major'"	
 	);
 	tpstmt.setInt(1, student_id);
 	tpstmt.setString(2, degree_type);
@@ -155,17 +155,17 @@ if (student_id != null && major != null && degree_type != null) {
 	PreparedStatement pstmt = connection.prepareStatement(
 		"With met_unit AS (" +
 		"select c.category, SUM(t.unit) AS unit " + 
-		"from general_course_requirement c, courses_taken t, past_names p " +
-		"where t.student_id = ? AND c.type = ? AND c.major = ? AND (c.course_number = t.course_number OR "+
+		"from undergrad_course_requirement c, courses_taken t, past_names p " +
+		"where t.student_id = ? AND c.degree_type = ? AND c.discipline = ? AND  c.degree_focus = 'major' AND (c.course_number = t.course_number OR "+
 		"(t.course_number = p.past_names AND p.course_number = c.course_number)) " +
 		"group by c.category)" +
 		"(select u.category, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
-		"from general_unit_requirement u, met_unit m " +
-		"where u.type = ? AND u.major = ? AND u.category = m.category)" +
+		"from undergrad_unit_requirement u, met_unit m " +
+		"where u.degree_type = ? AND u.discipline = ? AND u.degree_focus = 'major' AND u.category = m.category)" +
 		"union " +
 		"(select u.category, u.minimum_unit " +
-		"from general_unit_requirement u " +
-		"where u.type = ? AND u.major = ? AND u.category NOT IN (Select category from met_unit));"
+		"from undergrad_unit_requirement u " +
+		"where u.degree_type = ? AND u.discipline = ? AND u.degree_focus = 'major' AND u.category NOT IN (Select category from met_unit));"
 		
 			
 	);

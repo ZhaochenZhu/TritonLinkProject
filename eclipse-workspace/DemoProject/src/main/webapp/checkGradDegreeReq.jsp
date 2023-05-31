@@ -31,7 +31,7 @@ margin: auto;
 Connection connection = ConnectionProvider.getCon();
 //Statement statement = connection.createStatement() ;
 ResultSet resultset = connection.createStatement().executeQuery("select * from student s, student_period_attendance a where s.current_degree = 'Graduate' AND s.student_id = a.student_id AND a.quarter = 'Spring' AND a.year = 2023 AND a.enrolled = 'Yes' ") ;
-ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where type = 'Graduate'") ;
+ResultSet degreeResultset = connection.createStatement().executeQuery("select * from total_unit_requirement where degree_type = 'Graduate'") ;
 
 %>
 
@@ -119,9 +119,9 @@ if (student_id != null && major != null) {
 			"from courses_taken t, past_names p " +
 			"where t.student_id = ? AND ((t.course_number IN(" +
 			"select course_number from master_course_requirement " +
-			"where major = ?)) OR ((t.course_number = p.past_names) AND p.course_number IN(" +
+			"where discipline = ? AND degree_type = 'Graduate' AND degree_focus = 'major')) OR ((t.course_number = p.past_names) AND p.course_number IN(" +
 			"select course_number from master_course_requirement " +
-			"where major = ?)"+
+			"where discipline = ? AND degree_type = 'Graduate' AND degree_focus = 'major')"+
 			"))) " +
 			"union " +
 			"(select 0 AS unit " +
@@ -131,13 +131,13 @@ if (student_id != null && major != null) {
 			"from courses_taken t, past_names p " +
 			"where t.student_id = ? AND (t.course_number IN(" +
 			"select course_number from master_course_requirement " +
-			"where major = ?)) OR (t.course_number = p.past_names AND p.course_number IN(" +
+			"where discipline = ? AND degree_type = 'Graduate' AND degree_focus = 'major')) OR (t.course_number = p.past_names AND p.course_number IN(" +
 			"select course_number from master_course_requirement " +
-			"where major = ?)))))" +
+			"where discipline = ? AND degree_type = 'Graduate' AND degree_focus = 'major')))))" +
 			
 			"select DISTINCT IIF((u.total_unit - m.unit)<0,0.0 ,(u.total_unit - m.unit)) AS unit " +
 			"from total_unit_requirement u, met_unit m " +
-			"where u.type = 'Graduate' AND u.major = ?");
+			"where u.degree_type = 'Graduate' AND u.degree_focus = 'major' AND u.discipline = ?");
 	tpstmt.setInt(1, student_id);
 	tpstmt.setString(2, major);
 	tpstmt.setString(3, major);
@@ -153,15 +153,15 @@ if (student_id != null && major != null) {
 		"With met_unit AS (" +
 		"select c.concentration, SUM(t.unit) AS unit " + 
 		"from master_course_requirement c, courses_taken t, past_names p " +
-		"where t.student_id = ? AND c.major = ? AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " +
+		"where t.student_id = ? AND c.discipline = ? AND c.degree_type = 'Graduate' AND c.degree_focus = 'major' AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " +
 		"group by c.concentration)" +
 		"(select DISTINCT u.concentration, IIF((u.minimum_unit - m.unit) < 0, 0.0, (u.minimum_unit - m.unit)) AS unit " +
 		"from master_concentration_requirement u, met_unit m " +
-		"where u.major = ? AND u.concentration = m.concentration)" +
+		"where u.discipline = ? AND u.degree_type = 'Graduate' AND u.degree_focus = 'major' AND u.concentration = m.concentration)" +
 		"union " +
 		"(select DISTINCT u.concentration, u.minimum_unit AS unit " +
 		"from master_concentration_requirement u " +
-		"where u.major = ? AND u.concentration NOT IN (Select concentration from met_unit));"
+		"where u.discipline = ? AND u.degree_type = 'Graduate' AND u.degree_focus = 'major' AND u.concentration NOT IN (Select concentration from met_unit));"
 	);
 	pstmt.setInt(1, student_id);
 	pstmt.setString(2, major);
@@ -177,7 +177,7 @@ if (student_id != null && major != null) {
 		+"from grade_conversion g, (Select t.course_number, t.unit, t.grade, t.grading_option, m.concentration  "
 			+"From courses_taken t, master_course_requirement m, past_names p "	
 			+"Where ((m.course_number = t.course_number) OR (p.course_number = m.course_number AND p.past_names = t.course_number))  "
-		  +"AND m.major = ? "
+		  +"AND m.discipline = ? AND m.degree_type = 'Graduate' AND m.degree_focus = 'major'"
 			+"AND t.student_id = ? ) c "
 		+"where c.grade = g.letter_grade  "
 		+"GROUP BY c.concentration),  "
@@ -185,12 +185,12 @@ if (student_id != null && major != null) {
 		+"met_unit AS (" 
 		+"select c.concentration, SUM(t.unit) AS unit "  
 		+"from master_course_requirement c, courses_taken t, past_names p " 
-		+"where t.student_id = ? AND c.major = ? AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " 
+		+"where t.student_id = ? AND c.discipline = ? AND c.degree_type = 'Graduate' AND c.degree_focus = 'major' AND ((c.course_number = t.course_number) OR (p.course_number = c.course_number AND p.past_names = t.course_number)) " 
 		+"GROUP BY c.concentration) "
 		
 		+"Select DISTINCT m.concentration, g.conc_gpa, u.unit "
 		+"from master_concentration_requirement m, conc_gpa g, met_unit u, grade_conversion c "
-		+"where m.major = ? "
+		+"where m.discipline = ? AND m.degree_type = 'Graduate' AND m.degree_focus = 'major' "
 		+"AND m.concentration = g.concentration "
 		+"AND m.concentration = u.concentration "
 		/* +"AND c.letter_grade = m.minimum_grade " */
@@ -211,7 +211,7 @@ if (student_id != null && major != null) {
 		"With untaken AS ( "
 		+"select distinct m.course_number "
 		+"from master_course_requirement m "
-		+"Where m.major = ? AND m.course_number NOT IN ("
+		+"Where m.discipline = ? AND m.degree_type = 'Graduate' AND m.degree_focus = 'major' AND m.course_number NOT IN ("
 			+"(SELECT t.course_number from courses_taken t "
 			+"WHERE t.student_id = ?) "
 			+"UNION"
@@ -244,7 +244,7 @@ if (student_id != null && major != null) {
 
 <% 
 if (total_unit != null ) {
-	%><h2><%= "MS in " + major + ", Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
+	%><h2><%= "Graduate in " + major + ", Total Unit Requirements for " + student_name + ", " + student_id  %></h2>
 	<TABLE BORDER = "1">
 	<TR>
 	<TH>remaining total_unit</TH>
