@@ -235,7 +235,7 @@ if (actionMeeting != null && actionMeeting.equals("update")) {
 	conn.setAutoCommit(true);
 	conn.close();
 	}catch(Exception ex){
-		System.out.println(ex);
+		out.println(ex.getMessage());
 	}
 }
 if (actionMeeting != null && actionMeeting.equals("delete")) {
