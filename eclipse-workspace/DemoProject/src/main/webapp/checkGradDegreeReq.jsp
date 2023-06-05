@@ -16,7 +16,7 @@ margin: auto;
 }--%>
 </style>
 <meta charset="UTF-8">
-<title>CheckUndergradDegree</title>
+<title>CheckGradDegree</title>
 </head>
 <body>
 <TABLE>
