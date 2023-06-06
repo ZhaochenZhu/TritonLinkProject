@@ -43,6 +43,7 @@ if (action != null && action.equals("insert")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// INSERT the student attrs INTO the Course table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	("INSERT INTO courses_taken VALUES (?, ?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
@@ -54,13 +55,16 @@ if (action != null && action.equals("insert")) {
 	pstmt.setString(7, request.getParameter("professor"));
 	pstmt.setString(8, request.getParameter("grading_option"));
 	pstmt.executeUpdate();
+	}catch(Exception ex){
+		out.println(ex.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
 }
 
 if (action != null && action.equals("update")) {
-	//try{
+	try{
 	Connection conn = ConnectionProvider.getCon();
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
@@ -82,9 +86,9 @@ if (action != null && action.equals("update")) {
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
-	//}catch(Exception ex){
-		//System.out.println(ex);
-	//}
+	}catch(Exception ex){
+		out.println(ex.getMessage());
+	}
 }
 
 if (action != null && action.equals("delete")) {
@@ -92,6 +96,7 @@ if (action != null && action.equals("delete")) {
 	conn.setAutoCommit(false);
 	// Create the prepared statement and use it to
 	// DELETE the student FROM the Course table.
+	try{
 	PreparedStatement pstmt = conn.prepareStatement(
 	"DELETE FROM courses_taken WHERE student_id = ? AND course_number = ? AND section_id = ? AND year = ?");
 	pstmt.setInt(1, Integer.parseInt(request.getParameter("student_id")));
@@ -99,6 +104,9 @@ if (action != null && action.equals("delete")) {
 	pstmt.setString(3, request.getParameter("section_id"));	
 	pstmt.setInt(4, Integer.parseInt(request.getParameter("year")));
 	int rowCount = pstmt.executeUpdate();
+	}catch(Exception ex){
+		out.println(ex.getMessage());
+	}
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
