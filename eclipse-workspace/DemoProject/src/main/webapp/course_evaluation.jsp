@@ -78,7 +78,7 @@ if (action != null && action.equals("quarter_distribution")) {
 		}else{
 			cur_course = request.getParameter("course_number")+" in "+request.getParameter("quarter")
 				+", "+request.getParameter("year")+" by professor: "+request.getParameter("professor");
-			PreparedStatement pstmt = connection.prepareStatement("With student_course As( "
+/* 			PreparedStatement pstmt = connection.prepareStatement("With student_course As( "
 					+"select * "
 					+"from courses_taken c, section s "
 					+"where c.course_number = s.course_number "
@@ -102,7 +102,9 @@ if (action != null && action.equals("quarter_distribution")) {
 					+") "
 					+"union( select 'other' as grade, SUM(iif(grade not like 'A%' and grade not like 'B%' "
 					+"and grade not like 'C%' and grade not like 'D%', 1, 0)) from student_course )"
-					+"order by grade asc ");
+					+"order by grade asc ");  */
+ 			PreparedStatement pstmt = connection.prepareStatement(
+					"select grade,grade_count from CPQG where professor = ? AND year = ? AND quarter = ? AND course_number = ? order by grade"); 
 			pstmt.setString(1, request.getParameter("professor"));
 			pstmt.setInt(2, Integer.parseInt(request.getParameter("year")));
 			pstmt.setString(3, request.getParameter("quarter"));
@@ -174,7 +176,7 @@ if (action != null && action.equals("professor_grade_distribution")) {
 		professor_grade_summary = request.getParameter("course_number")+" by professor: "
 		+request.getParameter("professor")+", average grade received: "+avg_gpa.getFloat(1);
 				
-		PreparedStatement pstmt = connection.prepareStatement("With student_course As( "
+/*  		PreparedStatement pstmt = connection.prepareStatement("With student_course As( "
 				+"select * "
 				+"from courses_taken c, section s "
 				+"where c.course_number = s.course_number "
@@ -196,7 +198,9 @@ if (action != null && action.equals("professor_grade_distribution")) {
 				+") "
 				+"union( select 'other' as grade, SUM(iif(grade not like 'A%' and grade not like 'B%' "
 				+"and grade not like 'C%' and grade not like 'D%', 1, 0)) from student_course )"
-				+"order by grade asc ");
+				+"order by grade asc ");  */
+ 		PreparedStatement pstmt = connection.prepareStatement(
+				"select grade,grade_count from CPG where professor = ? AND course_number = ? order by grade"); 
 		pstmt.setString(1, request.getParameter("professor"));
 		pstmt.setString(2, request.getParameter("course_number"));
 		//out.println(pstmt.toString());
