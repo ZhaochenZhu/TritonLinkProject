@@ -44,6 +44,7 @@ Grading option:
   <option value="s_u">S/U</option>
   <option value="both">Both</option>
 </select>
+Maximum seats: <input type="text" name="maximum_seats" size="6"/>
 <input type="submit" value="Insert"/>
 </form>
 
@@ -56,7 +57,7 @@ if (action != null && action.equals("insert")) {
 	// INSERT the student attrs INTO the Student table.
 	try{
 	PreparedStatement pstmt = conn.prepareStatement(
-	("INSERT INTO section VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"));
+	("INSERT INTO section VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"));
 	pstmt.setInt(1,Integer.parseInt(request.getParameter("year")));
 	pstmt.setString(2, request.getParameter("section_id"));
 	pstmt.setString(3, request.getParameter("course_number"));
@@ -66,6 +67,7 @@ if (action != null && action.equals("insert")) {
 	pstmt.setString(7, request.getParameter("end_date"));
 	pstmt.setString(8, request.getParameter("professor"));
 	pstmt.setString(9, request.getParameter("grading_option"));
+	pstmt.setInt(10, Integer.parseInt(request.getParameter("maximum_seats")));
 	pstmt.executeUpdate();
 	}catch(Exception e){
 		out.println(e.getMessage());
@@ -81,26 +83,28 @@ if (action != null && action.equals("update")) {
 	// Create the prepared statement and use it to
 	// UPDATE the student attributes in the Student table.
 	PreparedStatement pstmt = conn.prepareStatement(
-	"UPDATE section SET quarter = ?, units = ?, start_date = ?, end_date = ?, professor = ?, grading_option = ? WHERE year = ? AND section_id = ? AND course_number = ?");	
+	"UPDATE section SET quarter = ?, units = ?, start_date = ?, end_date = ?, professor = ?, grading_option = ?, maximum_seats = ? WHERE year = ? AND section_id = ? AND course_number = ?");	
 	pstmt.setString(1, request.getParameter("quarter"));
     pstmt.setString(2, request.getParameter("units"));
 	pstmt.setString(3, request.getParameter("start_date"));
 	pstmt.setString(4, request.getParameter("end_date"));	
 	pstmt.setString(5, request.getParameter("professor"));
 	pstmt.setString(6, request.getParameter("grading_option"));
-	pstmt.setInt(7,Integer.parseInt(request.getParameter("year")));
-    pstmt.setString(8, request.getParameter("section_id"));
-	pstmt.setString(9, request.getParameter("course_number"));
+	pstmt.setInt(7,Integer.parseInt(request.getParameter("maximum_seats")));
+	pstmt.setInt(8,Integer.parseInt(request.getParameter("year")));
+    pstmt.setString(9, request.getParameter("section_id"));
+	pstmt.setString(10, request.getParameter("course_number"));
 	
-	// out.println(pstmt.toString());
+	out.println(pstmt.toString());
 	// System.out.println(pstmt.toString());
 	int rowCount = pstmt.executeUpdate();
 	conn.commit();
 	conn.setAutoCommit(true);
 	conn.close();
 	}catch(Exception ex){
-		System.out.println(ex);
+		out.println(ex);
 	}
+	
 }
 if (action != null && action.equals("delete")) {
 	Connection conn = ConnectionProvider.getCon();
@@ -136,6 +140,8 @@ if (action != null && action.equals("delete")) {
       <TH>end_date</TH>
       <TH>professor</TH>
       <TH>grading option</TH>
+      <TH>maximum_seats</TH>
+      <TH>available_seats</TH>
       </TR>
       <% while(resultset.next()){ %>
       <TR>
@@ -150,6 +156,8 @@ if (action != null && action.equals("delete")) {
       <TD><input type = "date" value="<%= resultset.getString(7) %>" name="end_date"> </TD>
       <TD><input value="<%= resultset.getString(8) %>" name="professor"></TD>
       <TD><input value="<%= resultset.getString(9) %>" name="grading_option"></TD>
+      <TD><input value="<%= resultset.getString(10) %>" name="maximum_seats"></TD>
+      <TD><input value="<%= resultset.getString(11) %>" name="available_seats"></TD>
       <td><input type="submit" value="Update"></td>
       </form>
        <form action="class.jsp" method="get">
@@ -235,7 +243,7 @@ if (actionMeeting != null && actionMeeting.equals("update")) {
 	conn.setAutoCommit(true);
 	conn.close();
 	}catch(Exception ex){
-		System.out.println(ex);
+		out.println(ex.getMessage());
 	}
 }
 if (actionMeeting != null && actionMeeting.equals("delete")) {

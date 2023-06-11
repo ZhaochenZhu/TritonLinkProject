@@ -64,6 +64,7 @@ Course number: <input type="text" name="course_number"/>
       <TH>Start Date</TH>
       <TH>End Date</TH>
       <TH>Grading Option</TH>
+      <TH>Available Seats</TH>
       <TH>Select unit</TH>
       <TH>Select grading option</TH>
       </TR>
@@ -80,7 +81,8 @@ Course number: <input type="text" name="course_number"/>
       <TD><input type="text" value="<%= section.getString(5) %>" name="units" readonly></TD>
       <TD><input type="date" value="<%= section.getString(6) %>" name="start_date" readonly></TD>
       <TD><input type="date" value="<%= section.getString(7) %>" name="end_date" readonly></TD>
-      <TD><input type="text" value="<%= section.getString(9) %>" name="grading_option" readonly></TD>      
+      <TD><input type="text" value="<%= section.getString(9) %>" name="grading_option" readonly></TD>   
+      <TD><input type="text" value="<%= section.getInt(11) %>" name="grading_option" readonly></TD>      
       </form>
       <form action="student_course_enroll.jsp" method="get">
 		<input type="hidden" value="enroll_class" name="action">
