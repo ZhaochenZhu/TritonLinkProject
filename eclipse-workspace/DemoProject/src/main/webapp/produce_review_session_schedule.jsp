@@ -15,7 +15,7 @@ margin: auto;
 }--%>
 </style>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Review Session Schedule</title>
 </head>
 <body>
 <TABLE>

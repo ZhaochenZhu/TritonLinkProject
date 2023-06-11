@@ -15,7 +15,7 @@ margin: auto;
 }--%>
 </style>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Grade Report</title>
 </head>
 <body>
 <TABLE>

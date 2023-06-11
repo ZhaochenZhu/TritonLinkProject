@@ -15,7 +15,7 @@ margin: auto;
 }--%>
 </style>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Check Class Roster</title>
 </head>
 <body>
 <TABLE>

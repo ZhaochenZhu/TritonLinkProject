@@ -9,7 +9,7 @@ table {
 }
 </style>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Thesis Committee</title>
 </head>
 <body>
 <TABLE>
